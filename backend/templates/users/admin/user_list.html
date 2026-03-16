@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários — AgroGestão</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f0f4f0;
+            min-height: 100vh;
+        }
+        header {
+            background: #2d6a2d;
+            color: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 { font-size: 1.4rem; }
+        .header-actions { display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; }
+        .btn-logout {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 0.4rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        main { padding: 2rem; max-width: 1100px; margin: 0 auto; }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .page-header h2 { color: #2d6a2d; font-size: 1.4rem; }
+        .btn-primary {
+            background: #2d6a2d;
+            color: #fff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #245424; }
+        .search-bar {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 0.75rem;
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 0.55rem 0.9rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.95rem;
+        }
+        .search-bar input:focus { outline: none; border-color: #2d6a2d; }
+        .search-bar button {
+            background: #2d6a2d;
+            color: #fff;
+            border: none;
+            padding: 0.55rem 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        thead { background: #f8faf8; }
+        th {
+            padding: 0.9rem 1.2rem;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 2px solid #e8f0e8;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        td {
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafcfa; }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.65rem;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+        .badge-admin    { background: #e8f0e8; color: #2d6a2d; }
+        .badge-produtor { background: #e8f0ff; color: #4a4aaa; }
+        .badge-ativo    { background: #e8f8e8; color: #1a7a1a; }
+        .empty {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+        }
+        .empty p { margin-top: 0.5rem; font-size: 0.9rem; }
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 1.5rem;
+        }
+        .breadcrumb a { color: #2d6a2d; text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .total { font-size: 0.85rem; color: #888; margin-top: 0.75rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🌱 AgroGestão</h1>
+    <div class="header-actions">
+        <span>{{ request.user.name }}</span>
+        <form method="post" action="{% url 'users:logout' %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="btn-logout">Sair</button>
+        </form>
+    </div>
+</header>
+
+<main>
+    <div class="breadcrumb">
+        <a href="{% url 'users:dashboard' %}">Dashboard</a> › Usuários
+    </div>
+
+    <div class="page-header">
+        <h2>👥 Gerenciar Usuários</h2>
+        <a href="{% url 'users:user_create' %}" class="btn-primary">+ Novo Usuário</a>
+    </div>
+
+    <form method="get" class="search-bar">
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            placeholder="Buscar por nome ou e-mail..."
+        >
+        <button type="submit">Buscar</button>
+    </form>
+
+    <div class="card">
+        {% if usuarios %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Perfil</th>
+                        <th>Status</th>
+                        <th>Criado em</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td><strong>{{ usuario.name }}</strong></td>
+                        <td>{{ usuario.email }}</td>
+                        <td>
+                            {% if usuario.is_admin %}
+                                <span class="badge badge-admin">Administrador</span>
+                            {% else %}
+                                <span class="badge badge-produtor">Produtor</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if usuario.is_active %}
+                                <span class="badge badge-ativo">Ativo</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ usuario.created_at|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p class="total" style="padding: 0.75rem 1.2rem;">
+                {{ usuarios.count }} usuário{{ usuarios.count|pluralize }} encontrado{{ usuarios.count|pluralize }}
+            </p>
+        {% else %}
+            <div class="empty">
+                <div style="font-size:2.5rem;">👤</div>
+                {% if query %}
+                    <p>Nenhum usuário encontrado para "<strong>{{ query }}</strong>".</p>
+                {% else %}
+                    <p>Nenhum usuário cadastrado ainda.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</main>
+
+</body>
+</html>

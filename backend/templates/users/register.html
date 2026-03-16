@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro — AgroGestão</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f0f4f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .logo h1 { color: #2d6a2d; font-size: 1.8rem; }
+        .logo p  { color: #666; font-size: 0.9rem; margin-top: 0.25rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.4rem;
+        }
+        input {
+            width: 100%;
+            padding: 0.65rem 0.9rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+        input:focus { outline: none; border-color: #2d6a2d; }
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #2d6a2d;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #245424; }
+        .errors {
+            background: #fff3f3;
+            border: 1px solid #f5c6c6;
+            border-radius: 5px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            color: #c0392b;
+            font-size: 0.875rem;
+        }
+        .links {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: #666;
+        }
+        .links a { color: #2d6a2d; text-decoration: none; font-weight: 600; }
+        .links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="logo">
+        <h1>🌱 AgroGestão</h1>
+        <p>Crie sua conta</p>
+    </div>
+
+    {% if form.non_field_errors %}
+        <div class="errors">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Nome completo</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+                <small style="color:#c0392b;">{{ form.name.errors.0 }}</small>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label>E-mail</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <small style="color:#c0392b;">{{ form.email.errors.0 }}</small>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label>Senha</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <small style="color:#c0392b;">{{ form.password1.errors.0 }}</small>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label>Confirme a senha</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <small style="color:#c0392b;">{{ form.password2.errors.0 }}</small>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn">Criar conta</button>
+    </form>
+
+    <div class="links">
+        Já tem conta? <a href="{% url 'users:login' %}">Faça login</a>
+    </div>
+</div>
+</body>
+</html>

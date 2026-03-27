@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgroMind Rural | A Mente que Cultiva</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Space+Grotesk:wght@300;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed-variant": "#004b73",
+              "primary-container": "#2ecc71",
+              "tertiary": "#f2ca50",
+              "on-background": "#e5e2e1",
+              "outline-variant": "#3d4a3e",
+              "on-error-container": "#ffdad6",
+              "surface-container": "#201f1f",
+              "on-primary-fixed-variant": "#005228",
+              "primary-fixed": "#6bfe9c",
+              "error-container": "#93000a",
+              "tertiary-fixed-dim": "#e9c349",
+              "primary-fixed-dim": "#4ae183",
+              "on-secondary-container": "#002c47",
+              "surface-dim": "#131313",
+              "outline": "#869486",
+              "on-primary-container": "#005027",
+              "secondary": "#92ccff",
+              "secondary-fixed": "#cce5ff",
+              "surface-container-lowest": "#0e0e0e",
+              "on-primary": "#003919",
+              "error": "#ffb4ab",
+              "inverse-primary": "#006d37",
+              "surface-container-highest": "#353534",
+              "tertiary-fixed": "#ffe088",
+              "surface": "#131313",
+              "surface-bright": "#3a3939",
+              "on-tertiary-fixed-variant": "#574500",
+              "on-error": "#690005",
+              "on-primary-fixed": "#00210c",
+              "background": "#131313",
+              "on-secondary-fixed": "#001d31",
+              "on-secondary": "#003351",
+              "on-tertiary-container": "#554300",
+              "on-tertiary-fixed": "#241a00",
+              "on-surface": "#e5e2e1",
+              "surface-container-high": "#2a2a2a",
+              "surface-variant": "#353534",
+              "secondary-container": "#3398db",
+              "inverse-surface": "#e5e2e1",
+              "inverse-on-surface": "#313030",
+              "surface-tint": "#4ae183",
+              "surface-container-low": "#1c1b1b",
+              "on-surface-variant": "#bbcbbb",
+              "secondary-fixed-dim": "#92ccff",
+              "on-tertiary": "#3c2f00",
+              "tertiary-container": "#d4af37",
+              "primary": "#54e98a"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .perspective-1000 { perspective: 1000px; }
+        .rotate-y-3 { transform: rotateY(3deg); }
+        .animate-marquee {
+            display: flex;
+            animation: marquee 30s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .glass-card {
+            background: rgba(32, 31, 31, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary selection:text-on-primary">
+<!-- SideNavBar (Drawer) -->
+<aside class="h-screen w-72 fixed left-0 top-0 z-50 bg-[#131313] dark:bg-[#131313] shadow-[0_24px_48px_rgba(0,0,0,0.4)] flex flex-col h-full py-8 px-6 border-r border-white/5">
+<div class="mb-12">
+<h1 class="text-2xl font-black tracking-tighter text-[#54e98a] font-headline">Deep Earth</h1>
+<p class="font-['Space_Grotesk'] font-bold tracking-tight uppercase text-xs text-[#2ecc71]">Digital Agronomist</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 text-[#54e98a] border-l-4 border-[#2ecc71] bg-gradient-to-r from-[#2ecc71]/10 to-transparent transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-headline font-bold tracking-tight uppercase text-xs">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 ease-out group" href="#">
+<span class="material-symbols-outlined">landscape</span>
+<span class="font-headline font-bold tracking-tight uppercase text-xs">Property</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 ease-out group" href="#">
+<span class="material-symbols-outlined">model_training</span>
+<span class="font-headline font-bold tracking-tight uppercase text-xs">Simulation</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 ease-out group" href="#">
+<span class="material-symbols-outlined">wb_sunny</span>
+<span class="font-headline font-bold tracking-tight uppercase text-xs">Weather</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 ease-out group" href="#">
+<span class="material-symbols-outlined">agriculture</span>
+<span class="font-headline font-bold tracking-tight uppercase text-xs">Operational</span>
+</a>
+</nav>
+<div class="mt-auto pt-8 border-t border-white/5">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="professional headshot of a middle-aged male agronomist in a field setting with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU0WJnXovV5hqsxOtGqbfososoLdKTydPu7vBSW4juAPKHs7Ys2t5jZoJY-CYOlkJrYphCpsbGJb4l9oy8SnC7tmm6fLpXCg-I9l8GLT3e43Vn1vfTAAT1E7-r5_QDQbCxPL7H1WIViOQj9EjH7AMFPLaheO8fqOjb6QejIlndgEl-tp6BQERPLakU0S0TyjxbUBS2RjiLdC31c3a1dIieuMrTeX0ITqZkxILBeLI8DtSOMck4q1tDjQ5lx6Y45b1Tdbs1TMmYohA"/>
+</div>
+<div>
+<p class="text-xs font-bold text-white">Chief Agronomist</p>
+<p class="text-[10px] text-[#2ecc71] uppercase tracking-widest">System Status: Active</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Cluster -->
+<header class="fixed top-0 right-0 w-[calc(100%-18rem)] z-40 bg-[#131313]/80 backdrop-blur-xl border-b border-white/5 flex justify-between items-center px-10 h-20 font-['Inter'] font-medium text-sm">
+<div class="flex items-center gap-8">
+<span class="font-['Space_Grotesk'] font-bold text-xl tracking-tighter text-white">AgroMind Rural</span>
+<div class="h-4 w-[1px] bg-white/10"></div>
+<nav class="flex gap-6">
+<a class="text-[#54e98a] hover:text-[#54e98a] transition-colors duration-200" href="#">Intelligence</a>
+<a class="text-gray-400 hover:text-[#54e98a] transition-colors duration-200" href="#">Satellite</a>
+<a class="text-gray-400 hover:text-[#54e98a] transition-colors duration-200" href="#">Markets</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<input class="bg-surface-container-low border-none rounded-full px-6 py-2 w-64 focus:ring-1 focus:ring-[#2ecc71]/30 transition-all text-xs outline-none" placeholder="Search parameters..." type="text"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">search</span>
+</div>
+<div class="flex gap-4">
+<button class="text-gray-400 hover:text-[#54e98a] transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="text-gray-400 hover:text-[#54e98a] transition-colors"><span class="material-symbols-outlined">settings</span></button>
+</div>
+</div>
+</header>
+<!-- Commodity Ticker -->
+<section class="fixed top-20 right-0 w-[calc(100%-18rem)] z-30 bg-[#1a1a1a]/90 backdrop-blur-md border-b border-[#f2ca50]/10 shadow-lg flex overflow-hidden whitespace-nowrap py-2 font-['Inter'] font-black uppercase text-[10px] tracking-[0.2em] text-[#f2ca50]">
+<div class="animate-marquee flex gap-12 items-center">
+<span>Soy: +1.2%</span>
+<span class="text-error">Corn: -0.4%</span>
+<span>Cotton: +0.8%</span>
+<span>Beef: +2.1%</span>
+<span>Wheat: +0.5%</span>
+<span>Coffee: +1.7%</span>
+<!-- Duplicate for seamless scroll -->
+<span>Soy: +1.2%</span>
+<span class="text-error">Corn: -0.4%</span>
+<span>Cotton: +0.8%</span>
+<span>Beef: +2.1%</span>
+<span>Wheat: +0.5%</span>
+<span>Coffee: +1.7%</span>
+</div>
+</section>
+<!-- Main Content Canvas -->
+<main class="ml-72 pt-28">
+<!-- Hero Section -->
+<section class="relative h-[921px] flex items-center justify-center overflow-hidden px-12">
+<!-- Background Image with Overlay -->
+<div class="absolute inset-0 z-0">
+<img alt="Sunrise over modern crop field" class="w-full h-full object-cover scale-110 opacity-60" data-alt="cinematic wide shot of a vast soybean field at sunrise with golden light rays piercing through misty morning air" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRaqlCa6yrDNKehGzQxUqemVXIuh01eU-8jyci8HhSxoecdW3JM_98tpLJjW_0IlOpFTp8ZFDFMWrIpDNuERgopZTg3bA2k__ukJ7TDEOcn8KV3bWbYXdhjIw8WtikF5SjSFBf47Ex_EK6vEQhzNdVBdqMTIQa7qmEXd4WjgIC8tyHBHhI8Wxy92RBgnObiM5MAJaIq4hp9109odEiwVsbaAeBikqAvOVJiM7LnSQucPwphWX3yHxMssozLsMRQr10FgssdpSP6UU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent"></div>
+</div>
+<!-- Content -->
+<div class="relative z-10 w-full max-w-6xl flex flex-col items-start gap-8">
+<div class="overflow-hidden">
+<span class="inline-block font-headline font-bold text-primary tracking-widest text-sm uppercase mb-4 opacity-80">Intelligence Platform v4.0</span>
+<h2 class="font-headline font-black text-[7rem] leading-[0.85] tracking-tighter text-white max-w-4xl">
+                        A Mente que <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Cultiva</span>
+</h2>
+</div>
+<p class="font-body text-xl text-gray-300 max-w-xl leading-relaxed">
+                    Sincronize a sabedoria da terra com o poder da inteligência artificial. Transformamos hectares em insights precisos para a próxima geração do agronegócio.
+                </p>
+<div class="flex gap-6 mt-6">
+<button class="group relative px-8 py-5 bg-primary text-on-primary font-headline font-bold rounded-xl overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(46,204,113,0.3)] perspective-1000">
+<span class="relative z-10">Descubra o Futuro do Agro</span>
+<div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+</button>
+<button class="px-8 py-5 border border-outline-variant text-white font-headline font-bold rounded-xl hover:bg-white/5 transition-all">
+                        Agendar Demonstração
+                    </button>
+</div>
+</div>
+<!-- Floating Isometric Icons (Decorative) -->
+<div class="absolute right-20 bottom-20 z-10 flex flex-col gap-12 opacity-40">
+<div class="w-16 h-16 bg-surface-container-high rotate-45 flex items-center justify-center shadow-2xl">
+<span class="material-symbols-outlined -rotate-45 text-primary text-3xl">agriculture</span>
+</div>
+<div class="w-12 h-12 bg-surface-container-highest rotate-45 flex items-center justify-center translate-x-12 shadow-2xl">
+<span class="material-symbols-outlined -rotate-45 text-secondary text-2xl">sensors</span>
+</div>
+<div class="w-14 h-14 bg-surface-container-high rotate-45 flex items-center justify-center -translate-x-8 shadow-2xl">
+<span class="material-symbols-outlined -rotate-45 text-tertiary text-2xl">satellite_alt</span>
+</div>
+</div>
+</section>
+<!-- Bento Grid Insights Section -->
+<section class="px-12 py-24 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto">
+<div class="mb-16">
+<h3 class="font-headline font-black text-5xl tracking-tight text-white mb-4">Métricas de Precisão</h3>
+<div class="w-24 h-1 bg-primary"></div>
+</div>
+<div class="grid grid-cols-12 gap-6">
+<!-- Large Card: Satellite Monitoring -->
+<div class="col-span-12 md:col-span-8 group relative overflow-hidden bg-surface-container h-[500px] rounded-xl border border-white/5 p-10 flex flex-col justify-end">
+<img alt="Satellite mountain view" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-110 transition-transform duration-700" data-alt="high-resolution satellite imagery showing topographic variations and thermal heat maps of agricultural valleys" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnQQZX3rZC0eyyIQkP3sfz8kJZtPtfsYjtGGfaJow8X3tqVJX7fuJWQfPsVy_k9nxyGwXpIsz0mQMcYNcvvUXndcGpLH66Lnk4F2YmtXpRTzF0WCdBzfReBVPSz_DYVEvAmMNGsu9WgjPv_p2WiMVbp2mLuYOoIgzQY88cQdYRUAcOilAcJ0ps0YGFp0YqG_aTbuLjIQIFIaFmyd-AgO3S5lgUsDGTBhuVT9RSW3p4u84iGs8kG15UJE_tUzv6Bwl18pSdpQHU_8k"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+<div class="relative z-10">
+<span class="text-secondary font-headline font-bold uppercase tracking-widest text-xs mb-2 block">Monitoramento em Tempo Real</span>
+<h4 class="text-4xl font-headline font-bold text-white mb-4">Visão Orbital do Patrimônio</h4>
+<p class="text-gray-400 max-w-md">Análise multiespectral diária para detecção precoce de pragas e estresse hídrico com precisão centimétrica.</p>
+</div>
+</div>
+<!-- Side Card: Yield Analysis -->
+<div class="col-span-12 md:col-span-4 bg-gradient-to-br from-primary-container/20 to-transparent p-10 rounded-xl border border-primary/10 flex flex-col gap-8">
+<span class="material-symbols-outlined text-primary text-5xl" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+<div>
+<h4 class="text-2xl font-headline font-bold text-white mb-2">Previsão de Safra</h4>
+<p class="text-sm text-gray-400 leading-relaxed">Modelagem preditiva baseada em dados históricos e tendências climáticas globais.</p>
+</div>
+<div class="mt-auto">
+<div class="text-6xl font-black font-headline text-primary">+24%</div>
+<div class="text-xs uppercase tracking-tighter text-primary/60 font-bold">Aumento Médio em Produtividade</div>
+</div>
+</div>
+<!-- Small Info Cards -->
+<div class="col-span-12 md:col-span-4 bg-surface-container-high p-8 rounded-xl hover:bg-surface-container-highest transition-colors cursor-default">
+<span class="material-symbols-outlined text-tertiary mb-6 text-3xl">payments</span>
+<h5 class="text-xl font-headline font-bold text-white mb-2">Liquidez &amp; Commodities</h5>
+<p class="text-sm text-gray-500">Integração direta com as principais bolsas globais para hedge estratégico.</p>
+</div>
+<div class="col-span-12 md:col-span-4 bg-surface-container-high p-8 rounded-xl hover:bg-surface-container-highest transition-colors cursor-default">
+<span class="material-symbols-outlined text-secondary mb-6 text-3xl">wb_sunny</span>
+<h5 class="text-xl font-headline font-bold text-white mb-2">Microclima Hiper-local</h5>
+<p class="text-sm text-gray-500">Estações meteorológicas IoT conectadas diretamente ao seu dashboard operacional.</p>
+</div>
+<div class="col-span-12 md:col-span-4 bg-surface-container-high p-8 rounded-xl hover:bg-surface-container-highest transition-colors cursor-default">
+<span class="material-symbols-outlined text-primary mb-6 text-3xl">group</span>
+<h5 class="text-xl font-headline font-bold text-white mb-2">Rede de Colaboração</h5>
+<p class="text-sm text-gray-500">Gestão de equipes e maquinário com despacho automatizado via geofencing.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="relative py-32 overflow-hidden px-12">
+<div class="max-w-4xl mx-auto text-center relative z-10">
+<h2 class="font-headline font-black text-6xl text-white mb-8 tracking-tighter">Pronto para liderar a revolução digital?</h2>
+<p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">Solicite um diagnóstico gratuito da sua propriedade e descubra como a Deep Earth pode transformar seus resultados.</p>
+<div class="flex justify-center gap-4">
+<button class="px-12 py-5 bg-white text-black font-headline font-black uppercase text-sm tracking-widest rounded-full hover:bg-primary transition-all duration-300">Começar Agora</button>
+</div>
+</div>
+<!-- Background Texture -->
+<div class="absolute inset-0 -z-10 opacity-5">
+<div class="grid grid-cols-12 h-full">
+<div class="border-r border-white/20"></div><div class="border-r border-white/20"></div><div class="border-r border-white/20"></div><div class="border-r border-white/20"></div>
+<div class="border-r border-white/20"></div><div class="border-r border-white/20"></div><div class="border-r border-white/20"></div><div class="border-r border-white/20"></div>
+<div class="border-r border-white/20"></div><div class="border-r border-white/20"></div><div class="border-r border-white/20"></div><div class="border-r border-white/20"></div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="relative w-full mt-20 pb-10 overflow-hidden bg-[#131313] flex flex-col items-center">
+<div class="font-['Space_Grotesk'] text-[10rem] font-black opacity-5 uppercase leading-none select-none">
+                Deep Earth
+            </div>
+<div class="max-w-7xl mx-auto px-10 w-full flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
+<div class="flex flex-col items-center md:items-start">
+<span class="font-['Space_Grotesk'] font-bold text-[#54e98a] text-2xl mb-2">Deep Earth</span>
+<p class="text-gray-600 text-xs text-center md:text-left">© 2024 Deep Earth Editorial. Precision intelligence for the modern landscape.</p>
+</div>
+<nav class="flex gap-10 text-gray-600 text-xs font-bold uppercase tracking-widest">
+<a class="hover:text-[#54e98a] transition-all underline-offset-8" href="#">Privacy Policy</a>
+<a class="hover:text-[#54e98a] transition-all underline-offset-8" href="#">Satellite Terms</a>
+<a class="hover:text-[#54e98a] transition-all underline-offset-8" href="#">API Docs</a>
+</nav>
+</div>
+</footer>
+</main>
+<!-- Contextual FAB -->
+<button class="fixed bottom-10 right-10 z-50 w-16 h-16 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all group overflow-hidden">
+<span class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform">support_agent</span>
+<div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</button>
+</body></html>

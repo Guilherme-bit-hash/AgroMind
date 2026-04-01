@@ -1,9 +1,13 @@
 # apps/users/tests/test_views.py
 # Python 3.12+ | Django 5.x
-
 import pytest
 from django.urls import reverse
-
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from apps.users.models import CustomUser, LoginAudit
 from .factories import AdminFactory, UserFactory
 
@@ -294,6 +298,45 @@ class TestRecuperacaoDeSenha:
 
         assert response.status_code == 200
         assert response.context["success"] is True
+
+    def test_acessa_tela_de_confirmacao_de_senha(self, client, db):
+        """GET em /usuarios/senha/redefinir/<uidb64>/<token>/ deve retornar 200."""
+        user = UserFactory()
+        token = default_token_generator.make_token(user)
+        uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+        
+        url = reverse("users:password_reset_confirm", kwargs={'uidb64': uidb64, 'token': token})
+        response = client.get(url)
+
+        assert response.status_code == 200
+        assert "form" in response.context
+
+    def test_envia_nova_senha_e_muda_com_sucesso(self, client, db):
+        """POST válido na página de confirmação altera a senha e redireciona (302)."""
+        user = UserFactory(password="senha-velha123")
+        token = default_token_generator.make_token(user)
+        uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+        
+        url = reverse("users:password_reset_confirm", kwargs={'uidb64': uidb64, 'token': token})
+        
+        response = client.post(url, {
+            "new_password1": "NovaSenhaMassa@12",
+            "new_password2": "NovaSenhaMassa@12",
+        })
+
+        assert response.status_code == 302
+        assert response["Location"] == reverse("users:password_reset_done")
+        
+        user.refresh_from_db()
+        assert user.check_password("NovaSenhaMassa@12") is True
+
+    def test_acessa_tela_de_sucesso_done(self, client, db):
+        """GET em /usuarios/senha/redefinida/ deve retornar 200 e mensagem de sucesso."""
+        url = reverse("users:password_reset_done")
+        response = client.get(url)
+
+        assert response.status_code == 200
+        assert "Senha Redefinida!" in response.content.decode()
 
 
 # ===========================================================================

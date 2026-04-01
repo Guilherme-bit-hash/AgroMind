@@ -73,6 +73,12 @@ class PasswordResetRequestForm(forms.Form):
 class PasswordResetConfirmForm(forms.Form):
     """Formulário para definir a nova senha — RF-03."""
 
+    def __init__(self, *args, **kwargs):
+        # Remove kwargs extras que a view passa mas o Form não espera
+        kwargs.pop("uidb64", None)
+        kwargs.pop("token", None)
+        super().__init__(*args, **kwargs)
+
     new_password1 = forms.CharField(
         label  = "Nova senha",
         widget = forms.PasswordInput(attrs={"placeholder": "Mínimo 8 caracteres"}),

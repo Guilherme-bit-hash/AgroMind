@@ -1,217 +1,124 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Usuários — AgroGestão</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f0f4f0;
-            min-height: 100vh;
-        }
-        header {
-            background: #2d6a2d;
-            color: #fff;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        header h1 { font-size: 1.4rem; }
-        .header-actions { display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; }
-        .btn-logout {
-            background: rgba(255,255,255,0.15);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.4);
-            padding: 0.4rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.875rem;
-        }
-        main { padding: 2rem; max-width: 1100px; margin: 0 auto; }
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        .page-header h2 { color: #2d6a2d; font-size: 1.4rem; }
-        .btn-primary {
-            background: #2d6a2d;
-            color: #fff;
-            padding: 0.6rem 1.2rem;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-        .btn-primary:hover { background: #245424; }
-        .search-bar {
-            background: #fff;
-            border-radius: 8px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            display: flex;
-            gap: 0.75rem;
-        }
-        .search-bar input {
-            flex: 1;
-            padding: 0.55rem 0.9rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 0.95rem;
-        }
-        .search-bar input:focus { outline: none; border-color: #2d6a2d; }
-        .search-bar button {
-            background: #2d6a2d;
-            color: #fff;
-            border: none;
-            padding: 0.55rem 1.2rem;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        .card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-        thead { background: #f8faf8; }
-        th {
-            padding: 0.9rem 1.2rem;
-            text-align: left;
-            font-weight: 600;
-            color: #555;
-            border-bottom: 2px solid #e8f0e8;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-        td {
-            padding: 0.9rem 1.2rem;
-            border-bottom: 1px solid #f0f0f0;
-            color: #333;
-        }
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background: #fafcfa; }
-        .badge {
-            display: inline-block;
-            padding: 0.2rem 0.65rem;
-            border-radius: 12px;
-            font-size: 0.78rem;
-            font-weight: 600;
-        }
-        .badge-admin    { background: #e8f0e8; color: #2d6a2d; }
-        .badge-produtor { background: #e8f0ff; color: #4a4aaa; }
-        .badge-ativo    { background: #e8f8e8; color: #1a7a1a; }
-        .empty {
-            text-align: center;
-            padding: 3rem;
-            color: #888;
-        }
-        .empty p { margin-top: 0.5rem; font-size: 0.9rem; }
-        .breadcrumb {
-            font-size: 0.85rem;
-            color: #888;
-            margin-bottom: 1.5rem;
-        }
-        .breadcrumb a { color: #2d6a2d; text-decoration: none; }
-        .breadcrumb a:hover { text-decoration: underline; }
-        .total { font-size: 0.85rem; color: #888; margin-top: 0.75rem; }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
-<header>
-    <h1>🌱 AgroGestão</h1>
-    <div class="header-actions">
-        <span>{{ request.user.name }}</span>
-        <form method="post" action="{% url 'users:logout' %}" style="margin:0;">
-            {% csrf_token %}
-            <button type="submit" class="btn-logout">Sair</button>
-        </form>
+{% block title %}Usuários — AgroMind Rural{% endblock %}
+
+{% block body %}
+<!-- Sidebar (reutilizada) -->
+<aside class="h-screen w-72 fixed left-0 top-0 z-50 bg-[#131313] shadow-[0_24px_48px_rgba(0,0,0,0.4)] flex flex-col py-8 px-6">
+    <div class="mb-12">
+        <h1 class="text-2xl font-black tracking-tighter text-primary font-headline">AgroMind</h1>
+        <p class="font-headline font-bold tracking-tight uppercase text-xs text-gray-500">Rural Intelligence</p>
     </div>
-</header>
-
-<main>
-    <div class="breadcrumb">
-        <a href="{% url 'users:dashboard' %}">Dashboard</a> › Usuários
-    </div>
-
-    <div class="page-header">
-        <h2>👥 Gerenciar Usuários</h2>
-        <a href="{% url 'users:user_create' %}" class="btn-primary">+ Novo Usuário</a>
-    </div>
-
-    <form method="get" class="search-bar">
-        <input
-            type="text"
-            name="q"
-            value="{{ query }}"
-            placeholder="Buscar por nome ou e-mail..."
-        >
-        <button type="submit">Buscar</button>
-    </form>
-
-    <div class="card">
-        {% if usuarios %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>E-mail</th>
-                        <th>Perfil</th>
-                        <th>Status</th>
-                        <th>Criado em</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for usuario in usuarios %}
-                    <tr>
-                        <td><strong>{{ usuario.name }}</strong></td>
-                        <td>{{ usuario.email }}</td>
-                        <td>
-                            {% if usuario.is_admin %}
-                                <span class="badge badge-admin">Administrador</span>
-                            {% else %}
-                                <span class="badge badge-produtor">Produtor</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if usuario.is_active %}
-                                <span class="badge badge-ativo">Ativo</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ usuario.created_at|date:"d/m/Y" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <p class="total" style="padding: 0.75rem 1.2rem;">
-                {{ usuarios.count }} usuário{{ usuarios.count|pluralize }} encontrado{{ usuarios.count|pluralize }}
-            </p>
-        {% else %}
-            <div class="empty">
-                <div style="font-size:2.5rem;">👤</div>
-                {% if query %}
-                    <p>Nenhum usuário encontrado para "<strong>{{ query }}</strong>".</p>
-                {% else %}
-                    <p>Nenhum usuário cadastrado ainda.</p>
-                {% endif %}
+    <nav class="flex-1 space-y-1">
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300" href="{% url 'users:dashboard' %}">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-primary border-l-4 border-primary-container bg-gradient-to-r from-primary-container/10 to-transparent transition-all duration-300" href="{% url 'users:user_list' %}">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Usuários</span>
+        </a>
+    </nav>
+    <div class="mt-auto pt-8 border-t border-white/5">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
+                <span class="material-symbols-outlined text-on-primary-container text-xl">person</span>
             </div>
-        {% endif %}
+            <div>
+                <p class="text-xs font-bold text-white uppercase tracking-wider">{{ request.user.name }}</p>
+                <p class="text-[10px] text-primary uppercase tracking-widest font-bold">{{ request.user.get_role_display }}</p>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<main class="ml-72 min-h-screen relative">
+    <!-- Top Nav -->
+    <header class="fixed top-0 right-0 w-[calc(100%-18rem)] z-40 bg-[#131313]/80 backdrop-blur-xl flex justify-between items-center px-10 h-20 border-b border-white/5">
+        <div class="flex items-center gap-4">
+            <h2 class="font-headline font-bold text-xl tracking-tighter text-white">Gestão de Usuários</h2>
+        </div>
+        <div class="flex items-center gap-6">
+            <form method="post" action="{% url 'users:logout' %}" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="flex items-center gap-2 text-gray-400 hover:text-error transition-colors duration-200 text-sm font-label">
+                    <span class="material-symbols-outlined text-lg">logout</span>
+                    <span class="uppercase tracking-wider text-[10px] font-bold">Sair</span>
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <div class="pt-28 px-10 pb-20 max-w-[1400px] mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-10 animate-fade-in-up">
+            <div>
+                <h3 class="font-headline text-[5rem] font-black opacity-10 uppercase leading-none absolute -top-2 -left-4 pointer-events-none select-none">Usuários</h3>
+                <h1 class="font-headline font-bold text-4xl tracking-tight text-white relative z-10">
+                    Lista de <span class="text-primary italic">Usuários</span>
+                </h1>
+            </div>
+            <a href="{% url 'users:user_create' %}" class="bg-primary hover:bg-primary-fixed transition-all py-3 px-6 rounded-xl flex items-center gap-3 group" id="btn-new-user">
+                <span class="material-symbols-outlined text-on-primary">person_add</span>
+                <span class="font-headline font-bold text-on-primary uppercase tracking-widest text-xs">Novo Usuário</span>
+            </a>
+        </div>
+
+        <!-- Search -->
+        <div class="mb-8 animate-fade-in-up delay-100">
+            <form method="get" class="relative max-w-md">
+                <input type="text" name="q" value="{{ query }}" placeholder="Buscar por nome ou e-mail..." class="w-full bg-surface-container-low border border-outline-variant/20 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:border-primary/50 transition-all" style="border: 1px solid rgba(61,74,62,0.2) !important; border-bottom: 1px solid rgba(61,74,62,0.2) !important; padding: 0.75rem 1rem !important; border-radius: 0.75rem !important;">
+                <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2">
+                    <span class="material-symbols-outlined text-gray-500 hover:text-primary transition-colors">search</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- User Table -->
+        <div class="bg-surface-container-low rounded-2xl overflow-hidden animate-fade-in-up delay-200">
+            <div class="grid grid-cols-12 gap-4 px-8 py-4 text-[10px] font-headline font-black uppercase tracking-widest text-gray-500 border-b border-white/5">
+                <div class="col-span-4">Nome</div>
+                <div class="col-span-4">E-mail</div>
+                <div class="col-span-2">Perfil</div>
+                <div class="col-span-2">Status</div>
+            </div>
+            {% for u in usuarios %}
+            <div class="grid grid-cols-12 gap-4 px-8 py-5 items-center hover:bg-surface-container/50 transition-colors border-b border-white/3">
+                <div class="col-span-4 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-sm">person</span>
+                    </div>
+                    <span class="text-sm text-white font-medium">{{ u.name }}</span>
+                </div>
+                <div class="col-span-4 text-sm text-on-surface-variant">{{ u.email }}</div>
+                <div class="col-span-2">
+                    {% if u.is_admin %}
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-tertiary bg-tertiary/10 px-2 py-1 rounded">Admin</span>
+                    {% else %}
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded">Produtor</span>
+                    {% endif %}
+                </div>
+                <div class="col-span-2">
+                    {% if u.is_active %}
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-primary"></div>
+                            <span class="text-[10px] font-bold uppercase text-primary">Ativo</span>
+                        </div>
+                    {% else %}
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-error"></div>
+                            <span class="text-[10px] font-bold uppercase text-error">Inativo</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="px-8 py-12 text-center text-gray-500">
+                <span class="material-symbols-outlined text-4xl mb-4 block">group_off</span>
+                <p class="text-sm">Nenhum usuário encontrado.</p>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </main>
-
-</body>
-</html>
+{% endblock %}

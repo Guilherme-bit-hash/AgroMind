@@ -1,123 +1,242 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login — AgroGestão</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f0f4f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        .card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 400px;
-        }
-        .logo {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .logo h1 { color: #2d6a2d; font-size: 1.8rem; }
-        .logo p  { color: #666; font-size: 0.9rem; margin-top: 0.25rem; }
-        .form-group { margin-bottom: 1.2rem; }
-        label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.4rem;
-        }
-        input {
-            width: 100%;
-            padding: 0.65rem 0.9rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 0.95rem;
-            transition: border-color 0.2s;
-        }
-        input:focus { outline: none; border-color: #2d6a2d; }
-        .btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: #2d6a2d;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 0.5rem;
-            transition: background 0.2s;
-        }
-        .btn:hover { background: #245424; }
-        .errors {
-            background: #fff3f3;
-            border: 1px solid #f5c6c6;
-            border-radius: 5px;
-            padding: 0.75rem 1rem;
-            margin-bottom: 1rem;
-            color: #c0392b;
-            font-size: 0.875rem;
-        }
-        .links {
-            text-align: center;
-            margin-top: 1.5rem;
-            font-size: 0.875rem;
-            color: #666;
-        }
-        .links a { color: #2d6a2d; text-decoration: none; font-weight: 600; }
-        .links a:hover { text-decoration: underline; }
-        .divider { margin: 0.5rem 0; }
-    </style>
-</head>
-<body>
-<div class="card">
-    <div class="logo">
-        <h1>🌱 AgroGestão</h1>
-        <p>Sistema de Gestão Rural</p>
+{% extends "base.html" %}
+
+{% block title %}Entrar — AgroMind Rural{% endblock %}
+
+{% block body %}
+<!-- Branding Header -->
+<header class="relative z-10 px-10 py-8 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-primary-container flex items-center justify-center rounded-xl">
+            <span class="material-symbols-outlined text-on-primary-container text-2xl">agriculture</span>
+        </div>
+        <div class="flex flex-col">
+            <span class="font-headline font-bold text-xl tracking-tighter text-white uppercase leading-none">AgroMind</span>
+            <span class="font-label text-[10px] tracking-[0.2em] text-primary uppercase">Rural Intelligence</span>
+        </div>
+    </div>
+    <div class="flex items-center gap-6">
+        <span class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+            Sistema Criptografado
+        </span>
+    </div>
+</header>
+
+<main class="relative z-10 flex-grow grid grid-cols-1 lg:grid-cols-12 px-6 lg:px-20 items-center gap-12 py-10">
+
+    <!-- Coluna Esquerda: Storytelling & Visualização -->
+    <div class="hidden lg:flex flex-col lg:col-span-5 space-y-12">
+        <div class="animate-fade-in-up">
+            <h1 class="font-headline text-5xl font-bold tracking-tight text-white leading-[1.1]">
+                O Solo da<br/><span class="text-primary italic">Confiança Digital.</span>
+            </h1>
+            <p class="mt-6 text-on-surface-variant max-w-md leading-relaxed">
+                Protegendo seus dados agrícolas através de hashing BCrypt acelerado por hardware
+                e autenticação JWT. Precisão e segurança para o agronegócio moderno.
+            </p>
+        </div>
+
+        <!-- Visualização de Criptografia -->
+        <div class="animate-fade-in-up delay-200 relative w-full aspect-video rounded-2xl bg-surface-container-low border border-outline-variant/20 overflow-hidden flex items-center justify-center">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5"></div>
+            <!-- JWT Stream Visualizer -->
+            <div class="relative flex flex-col items-center gap-8 w-full px-12">
+                <div class="flex justify-between w-full items-center relative">
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center border border-primary/20">
+                            <span class="material-symbols-outlined text-primary text-3xl">lock</span>
+                        </div>
+                        <span class="text-[9px] font-label uppercase tracking-tighter text-on-surface-variant">Credenciais</span>
+                    </div>
+                    <!-- The Stream -->
+                    <div class="flex-grow h-[1px] bg-gradient-to-r from-primary via-tertiary to-secondary mx-4 relative overflow-hidden">
+                        <div class="data-stream-particle" style="animation-delay: 0s;"></div>
+                        <div class="data-stream-particle" style="animation-delay: 1s;"></div>
+                        <div class="data-stream-particle" style="animation-delay: 2s;"></div>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center border border-secondary/20">
+                            <span class="material-symbols-outlined text-secondary text-3xl">key</span>
+                        </div>
+                        <span class="text-[9px] font-label uppercase tracking-tighter text-on-surface-variant">Bearer Token</span>
+                    </div>
+                </div>
+                <!-- BCrypt Hashing Card -->
+                <div class="w-full bg-surface-container-high/50 backdrop-blur-md p-4 rounded-xl border border-white/5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-[10px] font-headline font-bold uppercase text-tertiary">BCrypt Hashing Engine</span>
+                        <span class="text-[8px] font-label text-on-surface-variant">ROUNDS: 12</span>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="h-1 w-full bg-surface-container-lowest rounded-full overflow-hidden">
+                            <div class="h-full bg-tertiary w-3/4 shimmer"></div>
+                        </div>
+                        <code class="block text-[10px] font-mono text-on-surface-variant/60 truncate scramble-text" id="bcryptHash">
+                            $2y$12$Z0h8xN2K8Q7eU9L1M4o5P6R7S8T9U0V1W2X3Y4Z5A6B7C8D9E0F1
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="animate-fade-in-up delay-400 flex gap-8">
+            <div class="flex flex-col">
+                <span class="text-3xl font-headline font-bold text-white">256-bit</span>
+                <span class="text-[10px] font-label uppercase text-on-surface-variant tracking-widest">Criptografia Ponta a Ponta</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-3xl font-headline font-bold text-white">99.9%</span>
+                <span class="text-[10px] font-label uppercase text-on-surface-variant tracking-widest">Uptime do Sistema</span>
+            </div>
+        </div>
     </div>
 
-    {% if form.non_field_errors %}
-        <div class="errors">
-            {% for error in form.non_field_errors %}
-                <p>{{ error }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
+    <!-- Coluna Direita: Formulário de Autenticação -->
+    <div class="lg:col-span-6 lg:col-start-7 animate-fade-in-up delay-200">
+        <div class="bg-surface-container-low border border-white/5 rounded-3xl p-8 lg:p-12 shadow-2xl relative overflow-hidden">
+            <!-- Tabs -->
+            <div class="flex gap-8 mb-12 border-b border-outline-variant/20 pb-2">
+                <a href="{% url 'users:login' %}" class="text-primary font-headline font-bold text-sm uppercase tracking-widest relative" id="tab-login">
+                    Entrar
+                    <span class="absolute -bottom-[9px] left-0 w-full h-[2px] bg-primary"></span>
+                </a>
+                <a href="{% url 'users:register' %}" class="text-on-surface-variant hover:text-white transition-colors font-headline font-bold text-sm uppercase tracking-widest" id="tab-register">
+                    Cadastrar
+                </a>
+            </div>
 
-    <form method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="id_email">E-mail</label>
-            {{ form.email }}
-            {% if form.email.errors %}
-                <small style="color:#c0392b;">{{ form.email.errors.0 }}</small>
+            <!-- Erros do formulário -->
+            {% if form.non_field_errors %}
+                <div class="bg-error-container/20 border border-error/20 rounded-xl p-4 mb-6 animate-fade-in-up">
+                    {% for error in form.non_field_errors %}
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-error text-lg">error</span>
+                            <p class="text-error text-sm">{{ error }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
-        </div>
-        <div class="form-group">
-            <label for="id_password">Senha</label>
-            {{ form.password }}
-            {% if form.password.errors %}
-                <small style="color:#c0392b;">{{ form.password.errors.0 }}</small>
-            {% endif %}
-        </div>
-        <button type="submit" class="btn">Entrar</button>
-    </form>
 
-    <div class="links">
-        <a href="{% url 'users:password_reset_request' %}">Esqueci minha senha</a>
-        <div class="divider">•</div>
-        Não tem conta? <a href="{% url 'users:register' %}">Cadastre-se</a>
+            <!-- Formulário de Login -->
+            <form method="post" class="space-y-8" id="loginForm">
+                {% csrf_token %}
+                <div class="space-y-6">
+                    <!-- Campo E-mail -->
+                    <div class="group">
+                        <label for="id_email" class="block text-[10px] font-label uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">
+                            E-mail do Agrônomo
+                        </label>
+                        <div class="relative">
+                            {{ form.email }}
+                            <span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant/40 group-focus-within:text-primary transition-colors">person</span>
+                        </div>
+                        {% if form.email.errors %}
+                            <small class="text-error text-xs mt-1 block">{{ form.email.errors.0 }}</small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Campo Senha -->
+                    <div class="group">
+                        <div class="flex justify-between items-end mb-2">
+                            <label for="id_password" class="block text-[10px] font-label uppercase tracking-widest text-on-surface-variant group-focus-within:text-primary transition-colors">
+                                Senha de Acesso
+                            </label>
+                            <a class="text-[10px] font-label text-secondary hover:underline" href="{% url 'users:password_reset_request' %}">Esqueceu a senha?</a>
+                        </div>
+                        <div class="relative">
+                            {{ form.password }}
+                            <span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant/40 group-focus-within:text-primary transition-colors">lock</span>
+                        </div>
+                        {% if form.password.errors %}
+                            <small class="text-error text-xs mt-1 block">{{ form.password.errors.0 }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Verificação de Segurança -->
+                <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/10 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
+                        <span class="material-symbols-outlined text-tertiary">fingerprint</span>
+                    </div>
+                    <div class="flex-grow">
+                        <span class="block text-[10px] font-label uppercase text-on-surface-variant tracking-wider">Sessão Segura</span>
+                        <span class="block text-xs text-white/60">Autenticação BCrypt + sessão protegida por CSRF</span>
+                    </div>
+                </div>
+
+                <!-- Botão Submit -->
+                <button type="submit" class="w-full bg-primary hover:bg-primary-fixed transition-all group py-4 rounded-xl flex items-center justify-center gap-3" id="btn-login">
+                    <span class="font-headline font-bold text-on-primary uppercase tracking-widest text-sm">Iniciar Sessão</span>
+                    <span class="material-symbols-outlined text-on-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </button>
+
+                <div class="text-center">
+                    <span class="text-[10px] font-label text-on-surface-variant uppercase tracking-widest">
+                        Acesso Autorizado • AgroMind Protocol 24.1
+                    </span>
+                </div>
+            </form>
+
+            <!-- Loading overlay -->
+            <div class="hidden absolute inset-0 bg-surface/90 backdrop-blur-xl z-20 flex flex-col items-center justify-center text-center p-12" id="loginLoader">
+                <div class="w-20 h-20 rounded-full border-4 border-primary border-t-transparent animate-spin mb-8"></div>
+                <h3 class="font-headline text-2xl font-bold text-white mb-2">Validando Credenciais</h3>
+                <p class="text-on-surface-variant text-sm">Estabelecendo conexão segura com o servidor...</p>
+            </div>
+        </div>
     </div>
-</div>
-</body>
-</html>
+</main>
+
+<!-- Footer -->
+<footer class="relative w-full mt-20 pb-10 overflow-hidden bg-surface-container-lowest">
+    <div class="absolute inset-0 opacity-5 pointer-events-none flex items-center justify-center">
+        <span class="font-headline text-[10rem] font-black uppercase leading-none select-none">AgroMind</span>
+    </div>
+    <div class="max-w-7xl mx-auto px-10 flex flex-col items-center relative z-10">
+        <div class="flex gap-12 mb-12">
+            <a class="text-xs font-headline font-bold uppercase tracking-widest text-gray-600 hover:text-primary transition-colors underline-offset-8" href="#">Política de Privacidade</a>
+            <a class="text-xs font-headline font-bold uppercase tracking-widest text-gray-600 hover:text-primary transition-colors underline-offset-8" href="#">Termos de Uso</a>
+            <a class="text-xs font-headline font-bold uppercase tracking-widest text-gray-600 hover:text-primary transition-colors underline-offset-8" href="#">Documentação</a>
+        </div>
+        <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-outline-variant/20 to-transparent mb-12"></div>
+        <div class="flex flex-col md:flex-row justify-between w-full items-center gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-surface-container-high rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary text-sm">shield</span>
+                </div>
+                <span class="text-[10px] font-label text-on-surface-variant uppercase tracking-[0.2em]">Protocolo de Segurança V2.10</span>
+            </div>
+            <span class="text-[10px] font-label text-gray-600 uppercase tracking-widest">
+                © 2024 AGROMIND RURAL. INTELIGÊNCIA DE PRECISÃO PARA O AGRONEGÓCIO MODERNO.
+            </span>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animação BCrypt hash scramble
+    const hashEl = document.getElementById('bcryptHash');
+    if (hashEl) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$/.';
+        setInterval(() => {
+            let result = '$2y$12$';
+            for (let i = 0; i < 53; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            hashEl.textContent = result;
+        }, 150);
+    }
+
+    // Loading overlay ao submeter
+    const loginForm = document.getElementById('loginForm');
+    const loginLoader = document.getElementById('loginLoader');
+    if (loginForm && loginLoader) {
+        loginForm.addEventListener('submit', function() {
+            loginLoader.classList.remove('hidden');
+            loginLoader.classList.add('flex');
+        });
+    }
+</script>
+{% endblock %}

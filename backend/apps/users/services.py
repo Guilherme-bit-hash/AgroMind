@@ -184,8 +184,10 @@ def request_password_reset(request: HttpRequest, *, email: str) -> None:
     uid   = urlsafe_base64_encode(force_bytes(user.pk))
 
     # Monta o link completo de redefinição
+    from django.urls import reverse
     domain       = get_current_site(request).domain
-    reset_link   = f"http://{domain}/accounts/reset/{uid}/{token}/"
+    path         = reverse('users:password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
+    reset_link   = f"http://{domain}{path}"
 
     # Renderiza o corpo do e-mail a partir de um template
     email_body = render_to_string(

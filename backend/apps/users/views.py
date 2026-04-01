@@ -132,8 +132,8 @@ def password_reset_confirm_view(request, uidb64, token):
 
     if request.method == "POST" and form.is_valid():
         try:
-            confirm_password_reset(request, uidb64, token, form.cleaned_data["new_password1"])
-            return redirect("users:password_reset_complete")
+            confirm_password_reset(uidb64=uidb64, token=token, new_password=form.cleaned_data["new_password1"])
+            return redirect("users:password_reset_done")
         except ValidationError as e:
             form.add_error(None, e)
 

@@ -35,7 +35,7 @@ class TestPasswordResetServices:
         
         assert sent_email.subject == "AgroGestão — Redefinição de senha"
         assert user.email in sent_email.to
-        assert "127.0.0.1:8000/usuarios/senha/redefinir/" in sent_email.body
+        assert "example.com/usuarios/senha/redefinir/" in sent_email.body
 
     def test_request_password_reset_ignora_email_inexistente(self, db, mock_request):
         """

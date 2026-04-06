@@ -8,9 +8,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # Páginas Web (Frontend)
     path("usuarios/", include("apps.users.urls", namespace="users")),
+    path("propriedades/", include("apps.properties.web_urls", namespace="web_properties")),
 
-    # Sprint 02 — Propriedades e Talhões
+    # APIs REST (Sprint 02)
     path("api/propriedades/", include("apps.properties.urls", namespace="properties")),
 
     # JWT Token endpoints

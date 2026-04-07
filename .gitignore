@@ -33,3 +33,4 @@ mediafiles/
 # OS
 .DS_Store
 Thumbs.db
+.mysql_data/

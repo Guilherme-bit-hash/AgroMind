@@ -2,6 +2,8 @@
 # Python 3.12+ | Django 5.x | DRF
 # Serializers para CRUD de Propriedade e Talhão.
 
+from decimal import Decimal
+
 from rest_framework import serializers
 from .models import Propriedade, Talhao, UF, TipoSolo
 
@@ -20,7 +22,7 @@ class TalhaoSerializer(serializers.ModelSerializer):
 
 class TalhaoCreateSerializer(serializers.Serializer):
     nome      = serializers.CharField(max_length=100)
-    area      = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0.01)
+    area      = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal("0.01"))
     tipo_solo = serializers.ChoiceField(choices=TipoSolo.choices)
     latitude  = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
     longitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
@@ -28,7 +30,7 @@ class TalhaoCreateSerializer(serializers.Serializer):
 
 class TalhaoUpdateSerializer(serializers.Serializer):
     nome      = serializers.CharField(max_length=100, required=False)
-    area      = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0.01, required=False)
+    area      = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal("0.01"), required=False)
     tipo_solo = serializers.ChoiceField(choices=TipoSolo.choices, required=False)
     latitude  = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
     longitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
@@ -49,7 +51,7 @@ class PropriedadeSerializer(serializers.ModelSerializer):
 
 class PropriedadeCreateSerializer(serializers.Serializer):
     nome       = serializers.CharField(max_length=150)
-    area_total = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0.01)
+    area_total = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal("0.01"))
     municipio  = serializers.CharField(max_length=100)
     uf         = serializers.ChoiceField(choices=UF.choices)
     latitude   = serializers.DecimalField(max_digits=9, decimal_places=6)
@@ -58,7 +60,7 @@ class PropriedadeCreateSerializer(serializers.Serializer):
 
 class PropriedadeUpdateSerializer(serializers.Serializer):
     nome       = serializers.CharField(max_length=150, required=False)
-    area_total = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0.01, required=False)
+    area_total = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal("0.01"), required=False)
     municipio  = serializers.CharField(max_length=100, required=False)
     uf         = serializers.ChoiceField(choices=UF.choices, required=False)
     latitude   = serializers.DecimalField(max_digits=9, decimal_places=6, required=False)

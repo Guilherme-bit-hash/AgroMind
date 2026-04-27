@@ -1,7 +1,4 @@
 # apps/properties/services.py
-# Python 3.12+ | Django 5.x
-# Camada de serviços — regras de negócio para Propriedade e Talhão.
-
 from decimal import Decimal
 from django.core.exceptions import ValidationError
 from .models import Propriedade, Talhao
@@ -9,36 +6,18 @@ from .models import Propriedade, Talhao
 
 # ── Propriedade ───────────────────────────────────────────────────────────────
 
-def create_propriedade(
-    *,
-    owner,
-    nome: str,
-    area_total: Decimal,
-    municipio: str,
-    uf: str,
-    latitude: Decimal,
-    longitude: Decimal,
-) -> Propriedade:
-    """Cria uma nova propriedade vinculada ao usuário autenticado."""
-    propriedade = Propriedade(
-        owner=owner,
-        nome=nome,
-        area_total=area_total,
-        municipio=municipio,
-        uf=uf,
-        latitude=latitude,
-        longitude=longitude,
-    )
+def create_propriedade(*, owner, nome, area_total, municipio, uf, latitude, longitude) -> Propriedade:
+    propriedade = Propriedade(owner=owner, nome=nome, area_total=area_total,
+                               municipio=municipio, uf=uf, latitude=latitude, longitude=longitude)
     propriedade.full_clean()
     propriedade.save()
     return propriedade
 
 
 def update_propriedade(*, propriedade: Propriedade, **fields) -> Propriedade:
-    """Atualiza campos permitidos de uma propriedade existente."""
-    allowed_fields = {"nome", "area_total", "municipio", "uf", "latitude", "longitude"}
+    allowed = {"nome", "area_total", "municipio", "uf", "latitude", "longitude"}
     for field, value in fields.items():
-        if field not in allowed_fields:
+        if field not in allowed:
             raise ValidationError(f"Campo '{field}' não pode ser atualizado por aqui.")
         setattr(propriedade, field, value)
     propriedade.full_clean()
@@ -47,7 +26,6 @@ def update_propriedade(*, propriedade: Propriedade, **fields) -> Propriedade:
 
 
 def deactivate_propriedade(*, propriedade: Propriedade) -> Propriedade:
-    """Inativa uma propriedade sem excluir o histórico."""
     propriedade.is_active = False
     propriedade.save(update_fields=["is_active", "updated_at"])
     return propriedade
@@ -61,21 +39,37 @@ def create_talhao(
     nome: str,
     area: Decimal,
     tipo_solo: str,
+    codigo: str = "",
+    area_produtiva: Decimal | None = None,
+    declividade: Decimal | None = None,
+    ph_solo: Decimal | None = None,
+    cultura: str = "",
+    safra: str = "2026/2027",
+    sistema_cultivo: str = "direto",
+    irrigacao: str = "sequeiro",
+    pragas_doencas: str = "",
+    observacoes: str = "",
     latitude: Decimal | None = None,
     longitude: Decimal | None = None,
 ) -> Talhao:
-    """
-    Cria um talhão vinculado a uma propriedade.
-    Valida que a propriedade está ativa antes de aceitar o cadastro.
-    """
     if not propriedade.is_active:
         raise ValidationError("Não é possível cadastrar talhões em uma propriedade inativa.")
 
     talhao = Talhao(
         propriedade=propriedade,
         nome=nome,
+        codigo=codigo,
         area=area,
+        area_produtiva=area_produtiva,
+        declividade=declividade,
         tipo_solo=tipo_solo,
+        ph_solo=ph_solo,
+        cultura=cultura,
+        safra=safra,
+        sistema_cultivo=sistema_cultivo,
+        irrigacao=irrigacao,
+        pragas_doencas=pragas_doencas,
+        observacoes=observacoes,
         latitude=latitude,
         longitude=longitude,
     )
@@ -85,10 +79,14 @@ def create_talhao(
 
 
 def update_talhao(*, talhao: Talhao, **fields) -> Talhao:
-    """Atualiza campos de um talhão existente."""
-    allowed_fields = {"nome", "area", "tipo_solo", "latitude", "longitude"}
+    allowed = {
+        "nome", "codigo", "area", "area_produtiva", "declividade",
+        "tipo_solo", "ph_solo", "cultura", "safra",
+        "sistema_cultivo", "irrigacao", "pragas_doencas", "observacoes",
+        "latitude", "longitude",
+    }
     for field, value in fields.items():
-        if field not in allowed_fields:
+        if field not in allowed:
             raise ValidationError(f"Campo '{field}' não pode ser atualizado aqui.")
         setattr(talhao, field, value)
     talhao.full_clean()
@@ -97,7 +95,6 @@ def update_talhao(*, talhao: Talhao, **fields) -> Talhao:
 
 
 def deactivate_talhao(*, talhao: Talhao) -> Talhao:
-    """Inativa um talhão preservando o histórico vinculado (RF-10)."""
     talhao.is_active = False
     talhao.save(update_fields=["is_active", "updated_at"])
     return talhao

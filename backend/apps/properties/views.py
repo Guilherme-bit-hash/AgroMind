@@ -1,7 +1,4 @@
 # apps/properties/views.py
-# Python 3.12+ | Django 5.x | DRF
-# Views para CRUD de Propriedade e Talhão — todas protegidas por JWT.
-
 from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -26,13 +23,11 @@ class PropriedadeListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request: Request) -> Response:
-        """Lista todas as propriedades ativas do usuário autenticado."""
         propriedades = selectors.get_propriedades_by_user(user=request.user)
         serializer = PropriedadeSerializer(propriedades, many=True)
         return Response(serializer.data)
 
     def post(self, request: Request) -> Response:
-        """Cadastra uma nova propriedade para o usuário autenticado."""
         serializer = PropriedadeCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -82,7 +77,6 @@ class PropriedadeDetailView(APIView):
         return Response(PropriedadeSerializer(propriedade).data)
 
     def delete(self, request: Request, propriedade_id: int) -> Response:
-        """Inativa a propriedade (soft delete)."""
         propriedade = self._get_propriedade_or_404(propriedade_id, request.user)
         if not propriedade:
             return Response({"detail": "Propriedade não encontrada."}, status=status.HTTP_404_NOT_FOUND)
@@ -157,7 +151,6 @@ class TalhaoDetailView(APIView):
         return Response(TalhaoSerializer(talhao).data)
 
     def delete(self, request: Request, talhao_id: int) -> Response:
-        """Inativa o talhão sem apagar o histórico (RF-10)."""
         talhao = self._get_talhao_or_404(talhao_id, request.user)
         if not talhao:
             return Response({"detail": "Talhão não encontrado."}, status=status.HTTP_404_NOT_FOUND)

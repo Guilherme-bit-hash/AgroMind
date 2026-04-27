@@ -1,7 +1,4 @@
 # apps/properties/models.py
-# Python 3.12+ | Django 5.x
-# Sprint 02 — Módulo de Propriedades e Talhões
-
 from django.db import models
 from django.conf import settings
 
@@ -46,17 +43,34 @@ class TipoSolo(models.TextChoices):
     MISTO    = "misto",    "Misto"
 
 
+class Cultura(models.TextChoices):
+    SOJA     = "soja",     "Soja"
+    MILHO    = "milho",    "Milho"
+    CANA     = "cana",     "Cana-de-açúcar"
+    CAFE     = "cafe",     "Café"
+    ALGODAO  = "algodao",  "Algodão"
+    FEIJAO   = "feijao",   "Feijão"
+    TRIGO    = "trigo",    "Trigo"
+    SORGO    = "sorgo",    "Sorgo"
+    PASTAGEM = "pastagem", "Pastagem"
+    OUTRO    = "outro",    "Outro"
+
+
+class SistemaCultivo(models.TextChoices):
+    DIRETO       = "direto",       "Plantio direto"
+    CONVENCIONAL = "convencional", "Convencional"
+    MINIMO       = "minimo",       "Cultivo mínimo"
+
+
+class Irrigacao(models.TextChoices):
+    SEQUEIRO    = "sequeiro",    "Sequeiro"
+    PIVO        = "pivo",        "Pivô central"
+    GOTEJAMENTO = "gotejamento", "Gotejamento"
+    ASPERSAO    = "aspersao",    "Aspersão"
+
+
 class Propriedade(models.Model):
-    """
-    Representa uma fazenda/propriedade rural cadastrada por um usuário.
-    As coordenadas (latitude/longitude) alimentam diretamente o módulo climático.
-    """
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="propriedades",
-        verbose_name="Proprietário",
-    )
+    owner      = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="propriedades", verbose_name="Proprietário")
     nome       = models.CharField(max_length=150, verbose_name="Nome da fazenda")
     area_total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Área total (ha)")
     municipio  = models.CharField(max_length=100, verbose_name="Município")
@@ -77,23 +91,33 @@ class Propriedade(models.Model):
 
 
 class Talhao(models.Model):
-    """
-    Subdivisão de uma propriedade com características de solo específicas.
-    Toda safra será vinculada a um ou mais talhões.
-    Inativação preserva o histórico — nunca deve ser deletado se tiver safras.
-    """
-    propriedade = models.ForeignKey(
-        Propriedade,
-        on_delete=models.CASCADE,
-        related_name="talhoes",
-        verbose_name="Propriedade",
-    )
-    nome      = models.CharField(max_length=100, verbose_name="Nome do talhão")
-    area      = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Área (ha)")
-    tipo_solo = models.CharField(max_length=20, choices=TipoSolo.choices, verbose_name="Tipo de solo")
-    # Coordenadas opcionais no talhão — maior precisão climática (RF-09)
+    propriedade = models.ForeignKey(Propriedade, on_delete=models.CASCADE, related_name="talhoes", verbose_name="Propriedade")
+
+    # Identificação
+    nome   = models.CharField(max_length=100, verbose_name="Nome do talhão")
+    codigo = models.CharField(max_length=40, blank=True, verbose_name="Código interno")
+
+    # Área e solo
+    area          = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Área (ha)")
+    area_produtiva = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Área produtiva (ha)")
+    declividade   = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True, verbose_name="Declividade (%)")
+    tipo_solo     = models.CharField(max_length=20, choices=TipoSolo.choices, verbose_name="Tipo de solo")
+    ph_solo       = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True, verbose_name="pH (CaCl₂)")
+
+    # Cultura e manejo
+    cultura         = models.CharField(max_length=30, choices=Cultura.choices, blank=True, verbose_name="Cultura principal")
+    safra           = models.CharField(max_length=10, blank=True, default="2026/2027", verbose_name="Safra")
+    sistema_cultivo = models.CharField(max_length=20, choices=SistemaCultivo.choices, default=SistemaCultivo.DIRETO, verbose_name="Sistema de cultivo")
+    irrigacao       = models.CharField(max_length=20, choices=Irrigacao.choices, default=Irrigacao.SEQUEIRO, verbose_name="Irrigação")
+    pragas_doencas  = models.TextField(blank=True, verbose_name="Pragas e doenças monitoradas")
+
+    # Localização
     latitude  = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name="Latitude")
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name="Longitude")
+
+    # Observações
+    observacoes = models.TextField(blank=True, verbose_name="Observações")
+
     is_active  = models.BooleanField(default=True, verbose_name="Ativo")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

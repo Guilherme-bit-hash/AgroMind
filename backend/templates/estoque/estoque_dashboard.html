@@ -1,0 +1,555 @@
+{% extends "base.html" %}
+
+{% block title %}Estoque Dashboard — AgroMind Rural{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-modal {
+        background: rgba(20, 20, 20, 0.97);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    }
+    .custom-input {
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: none !important;
+        border-bottom: 1px solid #3d4a3e !important;
+        border-radius: 0 !important;
+        padding: 0.7rem 0 !important;
+        color: white !important;
+        font-family: 'Inter', sans-serif;
+        transition: border-color 0.3s ease !important;
+        width: 100%;
+    }
+    .custom-input:focus {
+        border-color: #54e98a !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    .custom-input::placeholder { color: #4f4f4f !important; }
+
+    .table-container { background: #191919; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; }
+    th { font-family: "Space Grotesk", sans-serif; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; color: #8c8c8c; padding: 16px 24px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    td { padding: 18px 24px; font-size: 13px; color: white; font-weight: 500; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(84,233,138,0.02); }
+
+    .modal-tab {
+        font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 14px; color: #555; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s;
+    }
+    .modal-tab.active { color: #54e98a; border-color: #54e98a; }
+    .modal-tab:hover { color: #888; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    
+    .field-label { display: block; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: #869486; margin-bottom: 6px; }
+    .field-label .req { color: #54e98a; }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Sidebar Copiada -->
+<aside class="h-screen w-72 fixed left-0 top-0 z-50 bg-[#131313] shadow-[0_24px_48px_rgba(0,0,0,0.4)] flex flex-col py-8 px-6">
+    <div class="mb-12">
+        <h1 class="text-2xl font-black tracking-tighter text-primary font-headline">AgroMind</h1>
+        <p class="font-headline font-bold tracking-tight uppercase text-xs text-gray-500">Rural Intelligence</p>
+    </div>
+    <nav class="flex-1 space-y-1">
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300" href="{% url 'users:dashboard' %}">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300" href="{% url 'web_properties:list' %}">
+            <span class="material-symbols-outlined">landscape</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Propriedades</span>
+        </a>
+        <!-- Restante do menu... -->
+        <a class="flex items-center gap-4 py-3 px-4 text-tertiary border-l-4 border-tertiary-container bg-gradient-to-r from-tertiary-container/10 to-transparent transition-all duration-300 group" href="{% url 'web_estoque:select' %}">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Estoque</span>
+        </a>
+    </nav>
+    <div class="mt-auto pt-8 border-t border-white/5">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-primary-container flex justify-center items-center">
+                <span class="material-symbols-outlined text-on-primary-container text-xl">person</span>
+            </div>
+            <div class="flex-grow">
+                <p class="text-xs font-bold text-white uppercase tracking-wider truncate">{{ user.name }}</p>
+                <p class="text-[10px] text-primary uppercase tracking-widest font-bold">{{ user.get_role_display }}</p>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- Top Navbar & Breadcrumbs -->
+<header class="fixed top-0 right-0 w-[calc(100%-18rem)] z-40 bg-[#131313]/80 backdrop-blur-xl flex justify-between items-center px-10 h-20 border-b border-white/5">
+    <div class="flex items-center gap-4">
+        <a href="{% url 'web_estoque:select' %}" class="text-gray-500 hover:text-white transition-colors"><span class="material-symbols-outlined text-sm">arrow_back</span></a>
+        <div class="h-4 w-px bg-white/10"></div>
+        <nav class="flex items-center gap-2 text-[10px] font-headline font-bold uppercase tracking-widest">
+            <a href="{% url 'users:dashboard' %}" class="text-gray-600 hover:text-gray-400">Dashboard</a>
+            <span class="text-gray-700">/</span>
+            <a href="{% url 'web_estoque:select' %}" class="text-gray-600 hover:text-gray-400">Estoque</a>
+            <span class="text-gray-700">/</span>
+            <span class="text-tertiary" id="breadcrumbFarm">Carregando...</span>
+        </nav>
+    </div>
+    <div class="flex items-center gap-6">
+        <!-- Badge Alerta Estoque Crítico (Oculto até JS preencher) -->
+        <div id="alertBadge" class="hidden items-center gap-2 bg-error/10 text-error border border-error/20 px-3 py-1 rounded-full animate-pulse-glow">
+            <span class="material-symbols-outlined text-sm">warning</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Atenção: Insumos críticos</span>
+        </div>
+        <form method="post" action="{% url 'users:logout' %}" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="flex items-center gap-2 text-gray-400 hover:text-error transition-colors text-sm font-label">
+                <span class="material-symbols-outlined">logout</span> <span class="uppercase tracking-wider text-[10px] font-bold">Sair</span>
+            </button>
+        </form>
+    </div>
+</header>
+
+<!-- Main Interface -->
+<main class="ml-72 min-h-screen pt-28 px-10 pb-20 max-w-[1400px] relative animate-fade-in-up">
+    <!-- Header with KPI -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
+        <div>
+            <h1 class="font-headline font-bold text-4xl text-white">Inventário e Insumos</h1>
+            <p class="text-gray-400 font-body text-sm mt-2 max-w-xl" id="farmNameSubtitle">Visão geral para ...</p>
+        </div>
+        <div class="flex gap-4">
+            <div class="bg-surface-container-low p-4 rounded-xl border border-white/5 min-w-[160px]">
+                <span class="block text-[10px] uppercase font-black text-gray-500 tracking-wider">Capital Alocado</span>
+                <span class="block font-headline font-black text-2xl text-tertiary mt-1" id="kpiValorTotal">R$ 0,00</span>
+            </div>
+            <div class="bg-surface-container-low p-4 rounded-xl border border-white/5 min-w-[140px]">
+                <span class="block text-[10px] uppercase font-black text-gray-500 tracking-wider">SKUs Ativos</span>
+                <span class="block font-headline font-black text-2xl text-white mt-1" id="kpiTotalInsumos">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-4">
+            <h2 class="font-headline font-bold text-xl text-white uppercase">Lista de Insumos</h2>
+        </div>
+        <button onclick="openModalInsumo()" class="bg-tertiary hover:bg-tertiary-fixed-dim text-on-tertiary text-xs font-black uppercase tracking-widest py-3 px-6 rounded-lg shadow-[0_0_15px_rgba(242,202,80,0.2)] transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">add</span> Cadastrar Insumo
+        </button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container mb-12">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr>
+                    <th>Código/Nome</th>
+                    <th>Tipo</th>
+                    <th>Estoque Atual</th>
+                    <th>Preço Un.</th>
+                    <th>Custo Total Estimado</th>
+                    <th>Status</th>
+                    <th class="text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="insumosTableBody">
+                <tr><td colspan="7" class="text-center text-gray-500 italic py-12">Carregando insumos...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<!-- Modal Novo Insumo -->
+<div id="modalInsumo" class="fixed inset-0 z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModalInsumo()"></div>
+    <div class="glass-modal w-full max-w-2xl relative rounded-2xl p-8 mx-4 transform scale-95 transition-transform duration-300" id="dialogInsumo">
+        <h2 class="font-headline font-bold text-3xl text-white mb-2">Cadastrar Insumo</h2>
+        <p class="text-sm text-gray-400 mb-8" id="modalInsumoDesc">As quantidades são inicializadas em 0. Registre depois uma "Entrada".</p>
+        
+        <form id="formInsumo" onsubmit="submitInsumo(event)">
+            <input type="hidden" id="i_id" value="">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <div class="md:col-span-2">
+                    <label class="field-label">Nome do Produto <span class="req">*</span></label>
+                    <input type="text" id="i_nome" required class="custom-input" placeholder="Ex: Glifosato 480">
+                </div>
+                <div>
+                    <label class="field-label">Tipo <span class="req">*</span></label>
+                    <select id="i_tipo" required class="custom-input appearance-none">
+                        <option value="semente">Semente</option>
+                        <option value="fertilizante">Fertilizante</option>
+                        <option value="defensivo">Defensivo (Agrotóxico)</option>
+                        <option value="combustivel">Combustível</option>
+                        <option value="outro">Outros</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Unidade de Medida <span class="req">*</span></label>
+                    <select id="i_unidade" required class="custom-input appearance-none">
+                        <option value="kg">Quilograma (kg)</option>
+                        <option value="l">Litro (l)</option>
+                        <option value="sc">Saca (sc)</option>
+                        <option value="t">Tonelada (t)</option>
+                        <option value="un">Unidade (un)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Preço Unitário (R$) <span class="req">*</span></label>
+                    <input type="number" step="0.01" min="0" id="i_preco" required class="custom-input" placeholder="150.00">
+                </div>
+                <div>
+                    <label class="field-label">Estoque Mínimo (Alerta) <span class="req">*</span></label>
+                    <input type="number" step="0.001" min="0" id="i_minimo" required class="custom-input" placeholder="10.0">
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-end gap-6 pt-10 mt-6 border-t border-white/5">
+                <button type="button" onclick="closeModalInsumo()" class="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors">Cancelar</button>
+                <button type="submit" id="btnSalvarInsumo" class="bg-tertiary hover:bg-tertiary-fixed-dim text-on-tertiary text-sm font-bold uppercase tracking-wider py-3 px-8 rounded-lg shadow-[0_0_15px_rgba(242,202,80,0.3)] transition-all flex items-center justify-center gap-2">
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Movimentação (Tabs: Entrada / Saída) -->
+<div id="modalMov" class="fixed inset-0 z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModalMov()"></div>
+    <div class="glass-modal w-full max-w-2xl relative rounded-2xl mx-4 transform scale-95 transition-transform duration-300 overflow-hidden" id="dialogMov">
+        <div class="px-8 pt-8 pb-4">
+            <h2 class="font-headline font-bold text-3xl text-white mb-2" id="movTitle">Movimentar Estoque</h2>
+            <p class="text-sm text-tertiary mb-6 font-bold" id="movSub">Produto: ...</p>
+            
+            <div class="flex gap-4 border-b border-white/5">
+                <button type="button" class="modal-tab active" id="tabEntradaBtn" onclick="switchMovTab('entrada')">Entrada (+)</button>
+                <button type="button" class="modal-tab" id="tabSaidaBtn" onclick="switchMovTab('saida')">Saída/Aplicação (-)</button>
+            </div>
+        </div>
+
+        <form id="formMov" onsubmit="submitMovimentacao(event)">
+            <input type="hidden" id="mov_insumo_id" value="">
+            <input type="hidden" id="mov_tipo_operacao" value="entrada"> <!-- 'entrada' ou 'saida' -->
+
+            <div class="px-8 py-6">
+                <!-- Entrada Panel -->
+                <div id="panelEntrada" class="tab-panel active">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div>
+                            <label class="field-label">Data e Hora <span class="req">*</span></label>
+                            <input type="datetime-local" id="m_e_data" required class="custom-input" style="color-scheme: dark;">
+                        </div>
+                        <div>
+                            <label class="field-label">Quantidade Adicionada <span class="req">*</span></label>
+                            <input type="number" step="0.001" min="0.001" id="m_e_qtd" class="custom-input" placeholder="0.00">
+                        </div>
+                        <div>
+                            <label class="field-label">Preço Unitário da Compra (R$) <span class="req">*</span></label>
+                            <input type="number" step="0.01" min="0" id="m_e_preco" class="custom-input">
+                        </div>
+                        <div>
+                            <label class="field-label">Nota Fiscal (Opcional)</label>
+                            <input type="text" id="m_e_nf" class="custom-input" placeholder="NF-12345">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Saida Panel -->
+                <div id="panelSaida" class="tab-panel">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div>
+                            <label class="field-label">Data e Hora <span class="req">*</span></label>
+                            <input type="datetime-local" id="m_s_data" class="custom-input" style="color-scheme: dark;">
+                        </div>
+                        <div>
+                            <label class="field-label">Quantidade Retirada <span class="req">*</span></label>
+                            <input type="number" step="0.001" min="0.001" id="m_s_qtd" class="custom-input" placeholder="0.00">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="field-label">Aplicar no Talhão <span class="req">*</span></label>
+                            <select id="m_s_talhao" class="custom-input appearance-none">
+                                <option value="">Carregando talhões...</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="field-label">Motivo / Observação</label>
+                            <input type="text" id="m_s_obs" class="custom-input" placeholder="Aplicação preventiva ferrugem asiática">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-end gap-6 px-8 py-6 bg-black/20 border-t border-white/5">
+                <button type="button" onclick="closeModalMov()" class="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors">Cancelar</button>
+                <button type="submit" id="btnSalvarMov" class="bg-primary hover:bg-primary-fixed-dim text-on-primary text-sm font-bold uppercase tracking-wider py-3 px-8 rounded-lg transition-all flex items-center justify-center gap-2">
+                    Registrar Movimentação
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const PROP_ID = Number("{{ propriedade_id }}");
+    const API_BASE = `/api/v1/propriedades/${PROP_ID}/insumos/`;
+
+    const csrfToken = (() => {
+        let cv = null;
+        if (document.cookie) { document.cookie.split(';').forEach(c => { const ck = c.trim(); if (ck.startsWith('csrftoken=')) { cv = decodeURIComponent(ck.substring(10)); } }); }
+        return cv;
+    })();
+
+    function formatNumber(num) {
+        return parseFloat(num).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Modal Insumo
+    function openModalInsumo(id = null) {
+        document.getElementById('formInsumo').reset();
+        document.getElementById('i_id').value = id || "";
+        document.getElementById('modalInsumo').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modalInsumo').classList.remove('opacity-0');
+            document.getElementById('dialogInsumo').classList.remove('scale-95');
+        }, 10);
+    }
+
+    function closeModalInsumo() {
+        document.getElementById('modalInsumo').classList.add('opacity-0');
+        document.getElementById('dialogInsumo').classList.add('scale-95');
+        setTimeout(() => { document.getElementById('modalInsumo').classList.add('hidden'); }, 300);
+    }
+
+    // Modal Movimentação
+    function switchMovTab(tab) {
+        document.getElementById('mov_tipo_operacao').value = tab;
+        document.querySelectorAll('#modalMov .modal-tab').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('#modalMov .tab-panel').forEach(el => el.classList.remove('active'));
+        
+        if(tab === 'entrada'){
+            document.getElementById('tabEntradaBtn').classList.add('active');
+            document.getElementById('panelEntrada').classList.add('active');
+            document.getElementById('m_e_qtd').setAttribute('required', 'true');
+            document.getElementById('m_s_qtd').removeAttribute('required');
+            document.getElementById('m_s_talhao').removeAttribute('required');
+        } else {
+            document.getElementById('tabSaidaBtn').classList.add('active');
+            document.getElementById('panelSaida').classList.add('active');
+            document.getElementById('m_s_qtd').setAttribute('required', 'true');
+            document.getElementById('m_s_talhao').setAttribute('required', 'true');
+            document.getElementById('m_e_qtd').removeAttribute('required');
+        }
+    }
+
+    function openModalMov(insumoId, insumoNome, precoAtual) {
+        document.getElementById('formMov').reset();
+        
+        // Setup data hora atual
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        const isoString = now.toISOString().slice(0,16);
+        document.getElementById('m_e_data').value = isoString;
+        document.getElementById('m_s_data').value = isoString;
+
+        document.getElementById('mov_insumo_id').value = insumoId;
+        document.getElementById('movSub').innerText = "Insumo: " + insumoNome;
+        document.getElementById('m_e_preco').value = parseFloat(precoAtual).toFixed(2);
+        
+        switchMovTab('entrada'); // default
+
+        document.getElementById('modalMov').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modalMov').classList.remove('opacity-0');
+            document.getElementById('dialogMov').classList.remove('scale-95');
+        }, 10);
+    }
+
+    function closeModalMov() {
+        document.getElementById('modalMov').classList.add('opacity-0');
+        document.getElementById('dialogMov').classList.add('scale-95');
+        setTimeout(() => { document.getElementById('modalMov').classList.add('hidden'); }, 300);
+    }
+
+    // Inicialização da Página
+    async function initPage() {
+        // Fetch property info
+        try {
+            const resp = await fetch(`/api/propriedades/${PROP_ID}/`, { headers: {"Accept": "application/json"} });
+            if(resp.ok) {
+                const prop = await resp.json();
+                document.getElementById('breadcrumbFarm').innerText = prop.nome;
+                document.getElementById('farmNameSubtitle').innerText = "Visão geral para " + prop.nome;
+            }
+        } catch(e) { console.warn(e); }
+
+        // Fetch talhoes select
+        try {
+            // Nota: Se a API de propr retornar talhões detalhados em `/api/propriedades/${id}/`, já daria pra preencher! No nosso sistema anterior, a detail devolvia JSON c/ talhões.
+            const resp = await fetch(`/api/propriedades/${PROP_ID}/`, { headers: {"Accept": "application/json"} });
+            if(resp.ok) {
+                const prop = await resp.json();
+                const sel = document.getElementById('m_s_talhao');
+                sel.innerHTML = '<option value="">Selecione o talhão destino...</option>';
+                prop.talhoes.forEach(t => {
+                    sel.innerHTML += `<option value="${t.id}">${t.nome} (${t.area}ha)</option>`;
+                });
+            }
+        } catch(e) { console.warn(e); }
+
+        carregarInsumos();
+    }
+
+    async function carregarInsumos() {
+        try {
+            const resp = await fetch(API_BASE, { headers: { "Accept": "application/json" } });
+            if (!resp.ok) throw new Error("Erro fetch insumos");
+            const insumos = await resp.json();
+            
+            const tb = document.getElementById('insumosTableBody');
+            tb.innerHTML = "";
+
+            let totalValor = 0;
+            let alertas = 0;
+
+            if(insumos.length === 0){
+                tb.innerHTML = `<tr><td colspan="7" class="text-center text-gray-500 italic py-12">Nenhum insumo cadastrado nesta propriedade.</td></tr>`;
+            }
+
+            insumos.forEach(i => {
+                const qtd = parseFloat(i.estoque_atual);
+                const preco = parseFloat(i.preco_unitario);
+                const min = parseFloat(i.estoque_minimo);
+                const custoTotal = qtd * preco;
+                totalValor += custoTotal;
+                
+                let isCritical = qtd <= min;
+                if(isCritical) alertas++;
+
+                const statusBadge = isCritical 
+                    ? `<span class="bg-error/10 text-error border border-error/20 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide flex w-max items-center gap-1"><span class="material-symbols-outlined text-[10px]">warning</span> Crítico</span>`
+                    : `<span class="bg-primary/10 text-primary border border-primary/20 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide">Regular</span>`;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <span class="block text-white font-bold text-sm truncate max-w-[200px]">${i.nome}</span>
+                        <span class="block text-[10px] text-gray-500 font-headline uppercase font-black uppercase mt-1">ID #${String(i.id).padStart(4,'0')}</span>
+                    </td>
+                    <td><span class="text-tertiary uppercase text-xs font-bold tracking-widest">${i.tipo}</span></td>
+                    <td class="font-headline font-bold text-lg ${isCritical?'text-error':'text-white'}">
+                        ${formatNumber(qtd)} <span class="text-xs text-gray-500">${i.unidade_medida}</span>
+                    </td>
+                    <td class="font-headline">R$ ${formatNumber(preco)}</td>
+                    <td class="font-headline font-bold text-primary">R$ ${formatNumber(custoTotal)}</td>
+                    <td>${statusBadge}</td>
+                    <td class="text-right whitespace-nowrap">
+                        <button onclick="openModalMov(${i.id}, '${i.nome.replace(/'/g,"\\'")}', ${preco})" class="text-xs text-on-tertiary bg-tertiary/90 hover:bg-tertiary font-bold uppercase tracking-wider py-2 px-4 rounded transition-colors mr-2">Estoque +/-</button>
+                    </td>
+                `;
+                tb.appendChild(tr);
+            });
+
+            document.getElementById('kpiTotalInsumos').innerText = insumos.length;
+            document.getElementById('kpiValorTotal').innerText = `R$ ${formatNumber(totalValor)}`;
+
+            const badge = document.getElementById('alertBadge');
+            if(alertas > 0) badge.classList.remove('hidden');
+            else badge.classList.add('hidden');
+
+        } catch (e) {
+            console.error(e);
+            alert("Erro ao carregar tabela de insumos.");
+        }
+    }
+
+    async function submitInsumo(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnSalvarInsumo');
+        btn.disabled = true; btn.innerHTML = `Salvando...`;
+
+        const id = document.getElementById('i_id').value;
+        const payload = {
+            nome: document.getElementById('i_nome').value,
+            tipo: document.getElementById('i_tipo').value,
+            unidade_medida: document.getElementById('i_unidade').value,
+            preco_unitario: document.getElementById('i_preco').value,
+            estoque_minimo: document.getElementById('i_minimo').value
+        };
+
+        try {
+            const method = id ? "PATCH" : "POST";
+            const url = id ? `${API_BASE}${id}/` : API_BASE;
+            
+            const resp = await fetch(url, {
+                method: method,
+                headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+                body: JSON.stringify(payload)
+            });
+
+            if(resp.ok) {
+                closeModalInsumo();
+                carregarInsumos();
+            } else {
+                const err = await resp.json();
+                alert("Erro de validação: " + JSON.stringify(err));
+            }
+        } catch(err) { alert("Erro de conexão."); console.error(err); }
+        
+        btn.disabled = false; btn.innerHTML = `Salvar`;
+    }
+
+    async function submitMovimentacao(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnSalvarMov');
+        btn.disabled = true; btn.innerHTML = `Registrando...`;
+
+        const insumoId = document.getElementById('mov_insumo_id').value;
+        const tipoOp = document.getElementById('mov_tipo_operacao').value;
+
+        let url = `${API_BASE}${insumoId}/`;
+        let payload = {};
+
+        if(tipoOp === 'entrada') {
+            url += 'entradas/';
+            payload = {
+                data: new Date(document.getElementById('m_e_data').value).toISOString().split('T')[0],
+                quantidade: document.getElementById('m_e_qtd').value,
+                preco_unitario: document.getElementById('m_e_preco').value,
+                numero_nota_fiscal: document.getElementById('m_e_nf').value
+            };
+        } else {
+            url += 'saidas/';
+            payload = {
+                data: new Date(document.getElementById('m_s_data').value).toISOString().split('T')[0],
+                quantidade: document.getElementById('m_s_qtd').value,
+                talhao_id: document.getElementById('m_s_talhao').value,
+                observacoes: document.getElementById('m_s_obs').value
+            };
+        }
+
+        try {
+            const resp = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+                body: JSON.stringify(payload)
+            });
+
+            if(resp.ok) {
+                closeModalMov();
+                carregarInsumos();
+            } else {
+                const err = await resp.json();
+                alert("Erro de validação ao movimentar: " + JSON.stringify(err));
+            }
+        } catch(err) { alert("Erro de conexão."); console.error(err); }
+
+        btn.disabled = false; btn.innerHTML = `Registrar Movimentação`;
+    }
+
+    document.addEventListener("DOMContentLoaded", initPage);
+</script>
+{% endblock %}

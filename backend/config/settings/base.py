@@ -49,6 +49,8 @@ THIRD_PARTY_APPS: list[str] = [
 LOCAL_APPS = [
     "apps.users",
     "apps.properties",
+    "apps.planting",
+    "apps.estoque",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -108,24 +110,8 @@ PASSWORD_HASHERS = [
 # ---------------------------------------------------------------------------
 DATABASES = {
     "default": {
-        "ENGINE":   "django.db.backends.mysql",
-        "NAME":     env("DB_NAME"),
-        "USER":     env("DB_USER"),
-        "PASSWORD": env("DB_PASSWORD"),
-        "HOST":     env("DB_HOST", default="127.0.0.1"),
-        "PORT":     env("DB_PORT", default="3306"),
-        "OPTIONS": {
-            "charset": "utf8mb4",
-            # utf8mb4 é o charset correto para MySQL — o "utf8" do MySQL
-            # é, na verdade, um utf8 incompleto (sem suporte a emojis e
-            # caracteres fora do BMP). utf8mb4 é o Unicode completo real.
-            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-            # STRICT_TRANS_TABLES impede que o MySQL aceite silenciosamente
-            # dados inválidos — falha ruidosamente em vez de truncar ou converter.
-        },
-        "CONN_MAX_AGE": 60,
-        # Reutiliza conexões por até 60 segundos — reduz overhead de
-        # reconexão em cenários de alta requisição.
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -208,4 +194,9 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": False,
     "AUTH_HEADER_TYPES": ("Bearer",),
+    
+
 }
+LOGIN_URL = "/usuarios/login/"
+LOGIN_REDIRECT_URL = "/usuarios/dashboard/"
+LOGOUT_REDIRECT_URL = "/usuarios/login/"

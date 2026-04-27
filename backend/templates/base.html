@@ -396,6 +396,39 @@
     </script>
 
     {% block extra_js %}{% endblock %}
+
+<script>
+async function login(email, password) {
+    const response = await fetch('/api/token/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: email,   // ou email dependendo do backend
+            password: password
+        })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        localStorage.setItem('access_token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
+
+        // redireciona
+        window.location.href = "/usuarios/dashboard/";
+    } else {
+        alert("Login inválido");
+    }
+}
+</script>
+
+
+
+
+
+
 </body>
 
 </html>

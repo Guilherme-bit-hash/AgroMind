@@ -18,19 +18,12 @@ class UserFactory(DjangoModelFactory):
 
     class Meta:
         model = CustomUser
-        skip_postgeneration_save = True
 
     name     = factory.Faker("name", locale="pt_BR")
     email    = factory.Sequence(lambda n: f"usuario{n}@teste.com.br")
     password = factory.PostGenerationMethodCall("set_password", "Teste@1234")
     role     = CustomUser.Role.PRODUTOR
     is_active = True
-
-    @classmethod
-    def _after_postgeneration(cls, instance, create, results=None):
-        """Salva explicitamente após set_password para persistir o hash."""
-        if create:
-            instance.save()
 
 
 class AdminFactory(UserFactory):

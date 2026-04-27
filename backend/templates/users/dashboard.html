@@ -48,7 +48,7 @@
             <span class="material-symbols-outlined">payments</span>
             <span class="font-headline font-bold tracking-tight uppercase text-xs">Financeiro</span>
         </a>
-        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="#">
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="{% url 'web_estoque:select' %}">
             <span class="material-symbols-outlined">inventory_2</span>
             <span class="font-headline font-bold tracking-tight uppercase text-xs">Estoque</span>
         </a>
@@ -243,7 +243,7 @@
                 </div>
             </div>
 
-            <div class="col-span-12 md:col-span-4 bg-surface-container-high p-8 group module-card animate-fade-in-up delay-500">
+            <a href="{% url 'web_estoque:select' %}" class="block col-span-12 md:col-span-4 bg-surface-container-high p-8 group module-card animate-fade-in-up delay-500 cursor-pointer">
                 <span class="material-symbols-outlined text-tertiary mb-4 text-3xl">inventory_2</span>
                 <h5 class="font-headline font-bold text-xl text-white mb-2">Estoque</h5>
                 <p class="text-sm text-gray-400 mb-6">Controle de insumos, fertilizantes e defensivos.</p>
@@ -251,7 +251,7 @@
                     <span class="text-[10px] font-bold text-tertiary uppercase tracking-wider">Acessar módulo</span>
                     <span class="material-symbols-outlined text-tertiary text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 

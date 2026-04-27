@@ -5,26 +5,41 @@
 {% block extra_css %}
 <style>
     .glass-modal {
-        background: rgba(20, 20, 20, 0.95);
+        background: rgba(20, 20, 20, 0.97);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.05);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
     }
+
     .custom-input {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 0.5rem;
-        padding: 0.75rem 1rem !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: none !important;
+        border-bottom: 1px solid #3d4a3e !important;
+        border-radius: 0 !important;
+        padding: 0.7rem 0 !important;
+        color: white !important;
+        font-family: 'Inter', sans-serif;
+        transition: border-color 0.3s ease !important;
+        width: 100%;
     }
+
     .custom-input:focus {
         border-color: #54e98a !important;
+        box-shadow: none !important;
+        outline: none !important;
     }
-    .table-container { 
+
+    .custom-input::placeholder {
+        color: #4f4f4f !important;
+    }
+
+    .table-container {
         background: #191919;
         border: 1px solid rgba(255,255,255,0.05);
         border-radius: 12px;
         overflow: hidden;
     }
+
     th {
         font-family: "Space Grotesk", sans-serif;
         font-size: 10px;
@@ -36,34 +51,247 @@
         text-align: left;
         border-bottom: 1px solid rgba(255,255,255,0.05);
     }
+
     td {
-        padding: 20px 24px;
-        font-size: 14px;
+        padding: 18px 24px;
+        font-size: 13px;
         color: white;
         font-weight: 500;
         border-bottom: 1px dashed rgba(255,255,255,0.05);
     }
+
     tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(84,233,138,0.02); }
+
+    .radio-pill input[type="radio"] { display: none; }
+
+    .radio-pill label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        background: #1c1b1b;
+        border: 1px solid #3d4a3e;
+        color: #869486;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #3d4a3e !important;
+        width: auto !important;
+    }
+
+    .radio-pill input[type="radio"]:checked + label {
+        background: #0d2b14;
+        border-color: #54e98a !important;
+        color: #54e98a;
+    }
+
+    .radio-pill label:hover {
+        border-color: #54e98a !important;
+        color: #54e98a;
+    }
+
+    .tag-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 10px 0 8px;
+        border-bottom: 1px solid #3d4a3e;
+        min-height: 44px;
+        cursor: text;
+        transition: border-color 0.3s ease;
+    }
+
+    .tag-container:focus-within {
+        border-color: #54e98a;
+    }
+
+    .tag-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        background: #0d2b14;
+        border: 1px solid #3d4a3e;
+        color: #54e98a;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .tag-pill button {
+        background: none;
+        border: none;
+        color: #54e98a;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1;
+        padding: 0;
+        opacity: 0.6;
+        transition: opacity 0.15s;
+    }
+
+    .tag-pill button:hover { opacity: 1; }
+
+    .tag-input-bare {
+        background: transparent !important;
+        border: none !important;
+        border-bottom: none !important;
+        padding: 0 !important;
+        color: white !important;
+        font-size: 0.8rem !important;
+        width: auto !important;
+        min-width: 120px;
+        flex: 1;
+        outline: none !important;
+    }
+
+    .modal-tab {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.62rem;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 8px 14px;
+        color: #555;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .modal-tab.active {
+        color: #54e98a;
+        border-color: #54e98a;
+    }
+
+    .modal-tab:hover { color: #888; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .field-label {
+        display: block;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 0.58rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #869486;
+        margin-bottom: 6px;
+    }
+
+    .field-label .req { color: #54e98a; }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 28px;
+    }
+
+    .section-title .icon-box {
+        width: 32px;
+        height: 32px;
+        background: rgba(84, 233, 138, 0.08);
+        border: 1px solid rgba(84, 233, 138, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .section-title .kicker {
+        display: block;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 900;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #54e98a;
+    }
+
+    .section-title .title {
+        display: block;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        color: white;
+    }
+
+    .inline-unit {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+    }
+
+    .inline-unit span {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #54e98a;
+        white-space: nowrap;
+    }
+
+    .error-box {
+        background: rgba(255, 84, 84, 0.08);
+        border: 1px solid rgba(255, 84, 84, 0.2);
+        color: #ff8a8a;
+        padding: 12px 14px;
+        font-size: 12px;
+        border-radius: 10px;
+        margin-bottom: 18px;
+        display: none;
+    }
 </style>
 {% endblock %}
 
 {% block body %}
-<!-- Sidebar -->
 <aside class="h-screen w-72 fixed left-0 top-0 z-50 bg-[#131313] shadow-[0_24px_48px_rgba(0,0,0,0.4)] flex flex-col py-8 px-6">
     <div class="mb-12">
         <h1 class="text-2xl font-black tracking-tighter text-primary font-headline">AgroMind</h1>
         <p class="font-headline font-bold tracking-tight uppercase text-xs text-gray-500">Rural Intelligence</p>
     </div>
-    <nav class="flex-1 space-y-1" id="sidebar-nav">
-        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="{% url 'users:dashboard' %}">
+
+    <nav class="flex-1 space-y-1">
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300" href="{% url 'users:dashboard' %}">
             <span class="material-symbols-outlined">dashboard</span>
             <span class="font-headline font-bold tracking-tight uppercase text-xs">Dashboard</span>
         </a>
-        <a class="flex items-center gap-4 py-3 px-4 text-primary border-l-4 border-primary-container bg-gradient-to-r from-primary-container/10 to-transparent transition-all duration-300 group" href="{% url 'web_properties:list' %}">
+        <a class="flex items-center gap-4 py-3 px-4 text-primary border-l-4 border-primary-container bg-gradient-to-r from-primary-container/10 to-transparent transition-all duration-300" href="{% url 'web_properties:list' %}">
             <span class="material-symbols-outlined">landscape</span>
             <span class="font-headline font-bold tracking-tight uppercase text-xs">Propriedades</span>
         </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300" href="#">
+            <span class="material-symbols-outlined">model_training</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Simulação</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300" href="#">
+            <span class="material-symbols-outlined">wb_sunny</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Clima</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300" href="#">
+            <span class="material-symbols-outlined">payments</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Financeiro</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300" href="{% url 'web_estoque:select' %}">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Estoque</span>
+        </a>
+        {% if user.is_admin %}
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300" href="{% url 'users:user_list' %}">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Usuários</span>
+        </a>
+        {% endif %}
     </nav>
+
     <div class="mt-auto pt-8 border-t border-white/5">
         <div class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-full bg-primary-container flex justify-center items-center">
@@ -77,10 +305,19 @@
     </div>
 </aside>
 
-<!-- Top Nav -->
 <header class="fixed top-0 right-0 w-[calc(100%-18rem)] z-40 bg-[#131313]/80 backdrop-blur-xl flex justify-between items-center px-10 h-20 border-b border-white/5">
     <div class="flex items-center gap-4">
-        <h2 class="font-headline font-bold text-xl tracking-tighter text-white">AgroMind Rural</h2>
+        <a href="{% url 'web_properties:list' %}" class="text-gray-500 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+        </a>
+        <div class="h-4 w-px bg-white/10"></div>
+        <nav class="flex items-center gap-2 text-[10px] font-headline font-bold uppercase tracking-widest">
+            <a href="{% url 'users:dashboard' %}" class="text-gray-600 hover:text-gray-400 transition-colors">Dashboard</a>
+            <span class="text-gray-700">/</span>
+            <a href="{% url 'web_properties:list' %}" class="text-gray-500 hover:text-gray-300 transition-colors">Propriedades</a>
+            <span class="text-gray-700">/</span>
+            <span class="text-primary" id="breadcrumbFarm">...</span>
+        </nav>
     </div>
     <div class="flex items-center gap-6">
         <form method="post" action="{% url 'users:logout' %}" class="m-0">
@@ -93,278 +330,672 @@
     </div>
 </header>
 
-<main class="ml-72 min-h-screen pt-28 px-10 pb-20 max-w-[1600px] relative animate-fade-in-up">
-    <!-- Breadcrumb -->
-    <a href="{% url 'web_properties:list' %}" class="flex items-center gap-2 text-primary hover:text-primary-fixed mb-6 transition-colors w-max">
-        <span class="material-symbols-outlined text-sm">arrow_back</span>
-        <span class="text-[10px] font-black uppercase tracking-widest">Propriedades</span>
-    </a>
-
-    <!-- Farm Header Container -->
-    <div class="bg-surface-container-low border border-white/5 rounded-2xl p-8 mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden group">
+<main class="ml-72 min-h-screen pt-28 px-10 pb-20 max-w-[1400px] relative animate-fade-in-up">
+    <div class="bg-surface-container-low border border-white/5 rounded-2xl p-8 mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
         <div class="z-10 relative">
+            <span class="block font-headline text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-2">Propriedade</span>
             <h1 class="font-headline font-bold text-5xl text-white mb-4" id="farmTitle">Carregando...</h1>
-            <div class="flex items-center gap-3">
-                <span class="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" id="farmLoc">...</span>
-                <span class="bg-white/5 text-gray-300 border border-white/10 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" id="farmArea">...</span>
+            <div class="flex items-center gap-3 flex-wrap">
+                <span class="bg-primary/10 text-primary border border-primary/20 px-3 py-1 text-xs font-bold uppercase tracking-wider" id="farmLoc">...</span>
+                <span class="bg-white/5 text-gray-300 border border-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wider" id="farmArea">...</span>
+                <span class="bg-white/5 text-gray-400 border border-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wider" id="farmTalhoes">...</span>
             </div>
         </div>
-        <button class="z-10 bg-white/5 hover:bg-white/10 text-white border border-white/10 px-6 py-3 py-2 rounded-lg text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-colors">
-            <span class="material-symbols-outlined text-sm">edit</span> Editar Propriedade
-        </button>
+
+        <div class="z-10 flex gap-3">
+            <button onclick="openEditPropriedadeModal()" class="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-5 py-3 text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-colors rounded-lg">
+                <span class="material-symbols-outlined text-sm">edit</span> Editar
+            </button>
+
+            <button onclick="excluirPropriedade()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-400/20 px-5 py-3 text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-colors rounded-lg">
+                <span class="material-symbols-outlined text-sm">delete</span> Excluir
+            </button>
+        </div>
+
+        <div class="absolute bottom-0 right-0 w-48 h-48 opacity-3 pointer-events-none">
+            <span class="material-symbols-outlined text-[220px] text-white opacity-5 translate-y-16 translate-x-16">landscape</span>
+        </div>
     </div>
 
-    <!-- Seção Talhões -->
     <div class="flex justify-between items-end mb-6">
-        <h2 class="font-headline font-bold text-2xl text-white uppercase mt-4">Talhões</h2>
+        <div>
+            <h2 class="font-headline font-bold text-2xl text-white uppercase">Talhões</h2>
+            <p class="text-gray-500 font-body text-xs mt-1">Subdivisões da propriedade com seus dados agronômicos</p>
+        </div>
         <button onclick="openModal()" class="bg-primary hover:bg-primary-fixed-dim text-on-primary text-xs font-black uppercase tracking-widest py-3 px-6 rounded-lg shadow-[0_0_15px_rgba(84,233,138,0.2)] transition-all flex items-center gap-2">
             <span class="material-symbols-outlined text-sm">add</span> Novo Talhão
         </button>
     </div>
 
-    <!-- Tabela Listagem -->
     <div class="table-container mb-12">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr>
                     <th>Nome</th>
                     <th>Área (HA)</th>
-                    <th>Tipo de Solo</th>
-                    <th>Coordenadas</th>
+                    <th>Solo</th>
+                    <th>Cultura</th>
+                    <th>Irrigação</th>
                     <th>Status</th>
                     <th class="text-right">Ações</th>
                 </tr>
             </thead>
             <tbody id="talhoesTableBody">
-                <tr><td colspan="6" class="text-center text-gray-500 italic py-12">Carregando talhões...</td></tr>
+                <tr><td colspan="7" class="text-center text-gray-500 italic py-12">Carregando talhões...</td></tr>
             </tbody>
         </table>
     </div>
 
-    <!-- Métricas Bottom Placeholder (Simulado Anexo 4) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="md:col-span-2 rounded-2xl overflow-hidden border border-white/5 h-64 relative bg-black">
-            <!-- Simulated Map -->
-            <div class="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" style="background-color: #0d1e12;"></div>
-            <div class="absolute inset-0 shimmer mix-blend-overlay"></div>
-            <div class="absolute right-4 bottom-4 flex flex-col gap-2">
-                <button class="w-10 h-10 bg-surface-container rounded-lg border border-white/10 text-primary flex items-center justify-center hover:bg-white/10"><span class="material-symbols-outlined">layers</span></button>
-                <button class="w-10 h-10 bg-surface-container rounded-lg border border-white/10 text-primary flex items-center justify-center hover:bg-white/10"><span class="material-symbols-outlined">search</span></button>
+            <div class="absolute inset-0 opacity-40" style="background-color: #0d1e12; background-image: repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(84,233,138,0.04) 39px,rgba(84,233,138,0.04) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(84,233,138,0.04) 39px,rgba(84,233,138,0.04) 40px);"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-center">
+                    <span class="material-symbols-outlined text-primary text-4xl mb-2 block">map</span>
+                    <span class="text-[10px] font-headline font-black uppercase tracking-widest text-primary">Mapa do talhão</span>
+                    <span class="block text-[10px] text-gray-600 mt-1">Georreferenciamento — em breve</span>
+                </div>
             </div>
         </div>
-        <div class="bg-surface-container-low rounded-2xl border border-white/5 p-8 flex flex-col justify-center">
-            <span class="text-[10px] uppercase font-black tracking-widest text-gray-500 mb-6">Métricas da Propriedade</span>
-            <div class="mb-6">
+
+        <div class="bg-surface-container-low rounded-2xl border border-white/5 p-8 flex flex-col justify-center gap-6">
+            <span class="text-[10px] uppercase font-black tracking-widest text-gray-500">Métricas</span>
+            <div>
                 <span class="font-headline font-bold text-5xl text-white inline-flex items-baseline" id="farmAreaBottom">0<span class="text-xl text-gray-500 ml-1">HA</span></span>
                 <span class="block text-xs uppercase font-bold text-gray-500 mt-1">Área Total</span>
             </div>
             <div>
-                <span class="font-headline font-bold text-4xl text-primary inline-flex items-baseline">72<span class="text-xl">%</span></span>
-                <span class="block text-xs uppercase font-bold text-gray-500 mt-1">Ocupação Produtiva</span>
+                <span class="font-headline font-bold text-3xl text-primary inline-flex items-baseline" id="totalTalhoesMetric">0<span class="text-base ml-1 text-primary/60">talhões</span></span>
+                <span class="block text-xs uppercase font-bold text-gray-500 mt-1">Talhões Ativos</span>
             </div>
         </div>
     </div>
 </main>
 
+<div id="modalNewTalhao" class="fixed inset-0 z-[100] flex items-start justify-center hidden opacity-0 transition-opacity duration-300 overflow-y-auto py-8">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal()"></div>
 
-<!-- Modal Novo Talhão -->
-<div id="modalNewTalhao" class="fixed inset-0 z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal()"></div>
-    
-    <div class="glass-modal w-full max-w-2xl relative rounded-2xl p-8 mx-4 transform scale-95 transition-transform duration-300" id="dialogTalhao">
-        <h2 class="font-headline font-bold text-3xl text-white mb-1">Novo Talhão</h2>
-        <p class="text-xs text-gray-400 font-black uppercase tracking-widest mb-8">Vinculado a: <span id="modalFarmName" class="text-white ml-1">...</span></p>
+    <div class="glass-modal w-full max-w-3xl relative rounded-2xl mx-4 transform scale-95 transition-transform duration-300 z-10" id="dialogTalhao">
+        <div class="px-8 pt-8 pb-0">
+            <h2 class="font-headline font-bold text-3xl text-white mb-1">Novo Talhão</h2>
+            <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-6">
+                Vinculado a:
+                <span id="modalFarmName" class="text-primary ml-1">...</span>
+            </p>
+
+            <div class="flex gap-0 border-b border-white/5 overflow-x-auto">
+                <button type="button" class="modal-tab active" onclick="switchTab('identificacao', this)">Identificação</button>
+                <button type="button" class="modal-tab" onclick="switchTab('solo', this)">Área e solo</button>
+                <button type="button" class="modal-tab" onclick="switchTab('cultura', this)">Cultura e manejo</button>
+                <button type="button" class="modal-tab" onclick="switchTab('localizacao', this)">Localização</button>
+            </div>
+        </div>
 
         <form id="talhaoForm" onsubmit="submitTalhao(event)">
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Nome do Talhão</label>
-                    <input type="text" id="t_nome" required class="custom-input text-white w-full" placeholder="Ex: Talhão Sul 01">
-                </div>
+            <div class="px-8 py-6">
+                <div id="formErrorBox" class="error-box"></div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Área (HA)</label>
-                        <input type="number" step="0.01" id="t_area" required class="custom-input text-white w-full" placeholder="0.00">
+                <div id="tab-identificacao" class="tab-panel active">
+                    <div class="section-title">
+                        <div class="icon-box">
+                            <span class="material-symbols-outlined text-primary text-sm">tag</span>
+                        </div>
+                        <div>
+                            <span class="kicker">01</span>
+                            <span class="title">Identificação</span>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Tipo de Solo</label>
-                        <select id="t_solo" required class="custom-input text-white w-full appearance-none">
-                            <option value="" disabled selected>Selecione o solo</option>
-                            <option value="arenoso">Arenoso</option>
-                            <option value="argiloso">Argiloso</option>
-                            <option value="silto_argiloso">Silto-argiloso</option>
-                            <option value="franco_arenoso">Franco-arenoso</option>
-                            <option value="latossolo_ve">Latossolo Vermelho</option>
-                            <option value="latossolo_am">Latossolo Amarelo</option>
-                            <option value="neossolo">Neossolo</option>
-                        </select>
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Latitude (Opcional)</label>
-                        <input type="number" step="0.000001" id="t_lat" class="custom-input text-white w-full" placeholder="-00.000000">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Longitude (Opcional)</label>
-                        <input type="number" step="0.000001" id="t_long" class="custom-input text-white w-full" placeholder="-00.000000">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                        <div>
+                            <label class="field-label">Nome do talhão <span class="req">*</span></label>
+                            <input type="text" id="t_nome" required class="custom-input" placeholder="Ex: Talhão Norte A1" />
+                        </div>
+
+                        <div>
+                            <label class="field-label">Código interno</label>
+                            <input type="text" id="t_codigo" class="custom-input" placeholder="TH-001" style="font-family:'Space Grotesk',monospace;" />
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 bg-primary/5 p-3 rounded-lg border border-primary/10 mt-2">
-                    <span class="material-symbols-outlined text-primary text-sm">info</span>
-                    <span class="text-[10px] text-gray-400 font-body">Coordenadas do talhão permitem maior precisão no monitoramento climático.</span>
+                <div id="tab-solo" class="tab-panel">
+                    <div class="section-title">
+                        <div class="icon-box">
+                            <span class="material-symbols-outlined text-primary text-sm">layers</span>
+                        </div>
+                        <div>
+                            <span class="kicker">02</span>
+                            <span class="title">Área e solo</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                        <div>
+                            <label class="field-label">Área do talhão <span class="req">*</span></label>
+                            <div class="inline-unit">
+                                <input type="number" id="t_area" required step="0.01" min="0.01" class="custom-input" placeholder="0,00" />
+                                <span>ha</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="field-label">Área produtiva</label>
+                            <div class="inline-unit">
+                                <input type="number" id="t_area_produtiva" step="0.01" min="0" class="custom-input" placeholder="0,00" />
+                                <span>ha</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="field-label">Tipo de solo <span class="req">*</span></label>
+                            <select id="t_solo" required class="custom-input appearance-none">
+                                <option value="">Selecione</option>
+                                <option value="argiloso">Argiloso</option>
+                                <option value="arenoso">Arenoso</option>
+                                <option value="siltoso">Siltoso</option>
+                                <option value="humifero">Humífero</option>
+                                <option value="calcario">Calcário</option>
+                                <option value="laterita">Laterita</option>
+                                <option value="misto">Misto</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="field-label">pH do solo (CaCl₂)</label>
+                            <input type="number" id="t_ph" step="0.1" min="3" max="9" class="custom-input" placeholder="6.0" />
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="field-label">Declividade média</label>
+                            <div class="inline-unit">
+                                <input type="number" id="t_decliv" step="0.1" min="0" max="100" class="custom-input" placeholder="0" />
+                                <span>%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-cultura" class="tab-panel">
+                    <div class="section-title">
+                        <div class="icon-box">
+                            <span class="material-symbols-outlined text-primary text-sm">agriculture</span>
+                        </div>
+                        <div>
+                            <span class="kicker">03</span>
+                            <span class="title">Cultura e manejo</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                        <div>
+                            <label class="field-label">Cultura principal</label>
+                            <select id="t_cultura" class="custom-input appearance-none">
+                                <option value="">Selecione</option>
+                                <option value="soja">Soja</option>
+                                <option value="milho">Milho</option>
+                                <option value="cana">Cana-de-açúcar</option>
+                                <option value="cafe">Café</option>
+                                <option value="algodao">Algodão</option>
+                                <option value="feijao">Feijão</option>
+                                <option value="trigo">Trigo</option>
+                                <option value="sorgo">Sorgo</option>
+                                <option value="pastagem">Pastagem</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="field-label">Safra</label>
+                            <select id="t_safra" class="custom-input appearance-none">
+                                <option value="2024/2025">2024/2025</option>
+                                <option value="2025/2026">2025/2026</option>
+                                <option value="2026/2027" selected>2026/2027</option>
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="field-label">Sistema de cultivo</label>
+                            <div class="flex flex-wrap gap-2 mt-1">
+                                <div class="radio-pill">
+                                    <input type="radio" id="sc_direto" name="t_sistema" value="direto" checked />
+                                    <label for="sc_direto">Plantio direto</label>
+                                </div>
+                                <div class="radio-pill">
+                                    <input type="radio" id="sc_conv" name="t_sistema" value="convencional" />
+                                    <label for="sc_conv">Convencional</label>
+                                </div>
+                                <div class="radio-pill">
+                                    <input type="radio" id="sc_min" name="t_sistema" value="minimo" />
+                                    <label for="sc_min">Cultivo mínimo</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="field-label">Irrigação</label>
+                            <div class="flex flex-wrap gap-2 mt-1">
+                                <div class="radio-pill">
+                                    <input type="radio" id="ir_seq" name="t_irrigacao" value="sequeiro" checked />
+                                    <label for="ir_seq">Sequeiro</label>
+                                </div>
+                                <div class="radio-pill">
+                                    <input type="radio" id="ir_pivo" name="t_irrigacao" value="pivo" />
+                                    <label for="ir_pivo">Pivô central</label>
+                                </div>
+                                <div class="radio-pill">
+                                    <input type="radio" id="ir_gote" name="t_irrigacao" value="gotejamento" />
+                                    <label for="ir_gote">Gotejamento</label>
+                                </div>
+                                <div class="radio-pill">
+                                    <input type="radio" id="ir_asp" name="t_irrigacao" value="aspersao" />
+                                    <label for="ir_asp">Aspersão</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="field-label">Pragas e doenças monitoradas</label>
+                            <div class="tag-container" id="tag-container" onclick="document.getElementById('tag-input').focus()">
+                                <input id="tag-input" class="tag-input-bare" placeholder="Adicionar e pressionar Enter..." onkeydown="addTag(event)" />
+                            </div>
+                            <p class="text-[10px] text-gray-700 mt-1">Pressione Enter para adicionar cada item</p>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="field-label">Observações</label>
+                            <textarea id="t_obs" class="custom-input w-full" rows="4" style="height:auto;min-height:72px;" placeholder="Histórico de uso, restrições, notas agronômicas..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-localizacao" class="tab-panel">
+                    <div class="section-title">
+                        <div class="icon-box">
+                            <span class="material-symbols-outlined text-primary text-sm">pin_drop</span>
+                        </div>
+                        <div>
+                            <span class="kicker">04</span>
+                            <span class="title">Localização</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-primary/5 border border-primary/15 p-4 mb-6 flex items-start gap-3 rounded-lg">
+                        <span class="material-symbols-outlined text-primary text-sm mt-0.5">info</span>
+                        <p class="text-[11px] text-gray-400 font-body leading-relaxed">
+                            Coordenadas opcionais permitem maior precisão no monitoramento climático e georreferenciamento do talhão.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                        <div>
+                            <label class="field-label">Latitude</label>
+                            <input type="number" step="0.000001" id="t_lat" class="custom-input" placeholder="-15.780100" />
+                        </div>
+
+                        <div>
+                            <label class="field-label">Longitude</label>
+                            <input type="number" step="0.000001" id="t_long" class="custom-input" placeholder="-47.929200" />
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex items-center justify-end gap-6 pt-10">
-                <button type="button" onclick="closeModal()" class="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors">Cancelar</button>
-                <button type="submit" id="btnSalvar" class="bg-primary hover:bg-primary-fixed-dim text-on-primary text-sm font-bold uppercase tracking-wider py-3 px-8 rounded-lg shadow-[0_0_15px_rgba(84,233,138,0.3)] transition-all flex items-center justify-center gap-2">
-                    Salvar Talhão
-                </button>
+            <div class="px-8 pb-8 pt-4 border-t border-white/5 flex items-center justify-between">
+                <div class="flex gap-2">
+                    <button type="button" id="btnPrev" onclick="prevTab()" class="hidden text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">arrow_back</span> Anterior
+                    </button>
+                    <button type="button" id="btnNext" onclick="nextTab()" class="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary-fixed flex items-center gap-1 transition-colors">
+                        Próximo <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button type="button" onclick="closeModal()" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="btnSalvar" class="bg-primary hover:bg-primary-fixed-dim text-on-primary text-xs font-bold uppercase tracking-wider py-3 px-7 rounded-lg shadow-[0_0_15px_rgba(84,233,138,0.25)] transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">check</span>
+                        Salvar Talhão
+                    </button>
+                </div>
             </div>
         </form>
     </div>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    const PROP_ID = {{ propriedade_id }};
+    const PROP_ID = Number("{{ propriedade_id }}");
+
     const csrfToken = (() => {
         let cv = null;
-        if(document.cookie && document.cookie!=='') {
+        if (document.cookie) {
             document.cookie.split(';').forEach(c => {
                 const cookie = c.trim();
-                if(cookie.substring(0, 10)==='csrftoken=') cv = decodeURIComponent(cookie.substring(10));
+                if (cookie.startsWith('csrftoken=')) {
+                    cv = decodeURIComponent(cookie.substring(10));
+                }
             });
         }
         return cv;
     })();
 
-    // Info global da propriedade atual
     let currentProp = null;
 
-    async function loadData() {
-        try {
-            // GET property
-            const pResp = await fetch(`/api/propriedades/${PROP_ID}/`, { headers: {"Accept":"application/json"} });
-            if(!pResp.ok) throw new Error("Property not found");
-            currentProp = await pResp.json();
-            
-            // Popula os fields globais
-            document.getElementById('farmTitle').innerText = currentProp.nome;
-            document.getElementById('modalFarmName').innerText = currentProp.nome;
-            document.getElementById('farmLoc').innerText = `${currentProp.municipio.toUpperCase()} / ${currentProp.uf}`;
-            
-            const areaDisplay = `${parseFloat(currentProp.area_total).toLocaleString('pt-BR')} HA`;
-            document.getElementById('farmArea').innerText = `ÁREA: ${areaDisplay}`;
-            document.getElementById('farmAreaBottom').innerHTML = `${parseFloat(currentProp.area_total).toLocaleString('pt-BR')}<span class="text-xl text-gray-500 ml-1">HA</span>`;
+    const TAB_ORDER = ['identificacao', 'solo', 'cultura', 'localizacao'];
+    let currentTabIdx = 0;
 
-            // GET talhoes
-            const tResp = await fetch(`/api/propriedades/${PROP_ID}/talhoes/`, { headers: {"Accept":"application/json"} });
-            const talhoes = await tResp.json();
-            
-            const tbody = document.getElementById('talhoesTableBody');
-            tbody.innerHTML = '';
-            
-            if(talhoes.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-500 italic py-12">Nenhum talhão cadastrado para esta propriedade.</td></tr>';
-                return;
-            }
+    function switchTab(name, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.modal-tab').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        if (btn) btn.classList.add('active');
+        currentTabIdx = TAB_ORDER.indexOf(name);
+        updateNavBtns();
+    }
 
-            talhoes.forEach(t => {
-                const tr = document.createElement('tr');
-                
-                // Formatação status
-                let statusHtml = '';
-                if(t.is_active) {
-                    statusHtml = `<div class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><span class="text-[10px] font-black uppercase text-primary tracking-widest">Ativo</span></div>`;
-                } else {
-                    statusHtml = `<div class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-gray-600"></div><span class="text-[10px] font-black uppercase text-gray-500 tracking-widest">Inativo</span></div>`;
-                }
+    function updateNavBtns() {
+        document.getElementById('btnPrev').classList.toggle('hidden', currentTabIdx === 0);
+        document.getElementById('btnNext').classList.toggle('hidden', currentTabIdx === TAB_ORDER.length - 1);
+    }
 
-                // Coords format
-                const coords = (t.latitude && t.longitude) ? `${parseFloat(t.latitude).toFixed(2)} / ${parseFloat(t.longitude).toFixed(2)}` : 'Não definidas';
-
-                tr.innerHTML = `
-                    <td class="font-bold">${t.nome}</td>
-                    <td>${parseFloat(t.area).toLocaleString('pt-BR')}</td>
-                    <td>${t.tipo_solo_display}</td>
-                    <td class="text-gray-400 font-body text-xs">${coords}</td>
-                    <td>${statusHtml}</td>
-                    <td class="text-right">
-                        <button class="text-gray-400 hover:text-white mx-2"><span class="material-symbols-outlined text-[1rem]">edit</span></button>
-                        <button class="text-gray-400 hover:text-error mx-2"><span class="material-symbols-outlined text-[1rem]">visibility_off</span></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-        } catch (err) {
-            console.error(err);
-            alert("Erro ao buscar dados do servidor.");
+    function nextTab() {
+        if (currentTabIdx < TAB_ORDER.length - 1) {
+            const tabs = document.querySelectorAll('.modal-tab');
+            switchTab(TAB_ORDER[currentTabIdx + 1], tabs[currentTabIdx + 1]);
         }
     }
 
-    /* Modal Handlers */
+    function prevTab() {
+        if (currentTabIdx > 0) {
+            const tabs = document.querySelectorAll('.modal-tab');
+            switchTab(TAB_ORDER[currentTabIdx - 1], tabs[currentTabIdx - 1]);
+        }
+    }
+
+    function addTag(e) {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+
+        const inp = document.getElementById('tag-input');
+        const val = inp.value.trim();
+        if (!val) return;
+
+        const pill = document.createElement('div');
+        pill.className = 'tag-pill';
+        pill.dataset.val = val;
+        pill.innerHTML = `${val} <button type="button" onclick="removeTag(this)">×</button>`;
+        inp.parentNode.insertBefore(pill, inp);
+        inp.value = '';
+    }
+
+    function removeTag(btn) {
+        btn.closest('.tag-pill').remove();
+    }
+
+    function getTagValues() {
+        return Array.from(document.querySelectorAll('#tag-container .tag-pill'))
+            .map(p => p.dataset.val)
+            .join(', ');
+    }
+
     const modal = document.getElementById('modalNewTalhao');
     const dialog = document.getElementById('dialogTalhao');
     const form = document.getElementById('talhaoForm');
+    const formErrorBox = document.getElementById('formErrorBox');
 
     function openModal() {
+        clearFormErrors();
         modal.classList.remove('hidden');
-        setTimeout(() => { modal.classList.remove('opacity-0'); dialog.classList.remove('scale-95'); }, 10);
-    }
-    function closeModal() {
-        modal.classList.add('opacity-0'); dialog.classList.add('scale-95');
-        setTimeout(() => { modal.classList.add('hidden'); form.reset(); }, 300);
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            dialog.classList.remove('scale-95');
+        }, 10);
+        switchTab('identificacao', document.querySelectorAll('.modal-tab')[0]);
     }
 
-    /* POST Submit */
+    function closeModal() {
+        modal.classList.add('opacity-0');
+        dialog.classList.add('scale-95');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            form.reset();
+            clearFormErrors();
+            document.querySelectorAll('#tag-container .tag-pill').forEach(p => p.remove());
+        }, 300);
+    }
+
+    function clearFormErrors() {
+        formErrorBox.style.display = 'none';
+        formErrorBox.innerHTML = '';
+    }
+
+    function showFormErrors(errors) {
+        const linhas = [];
+
+        Object.entries(errors).forEach(([campo, mensagens]) => {
+            if (Array.isArray(mensagens)) {
+                linhas.push(`<div><strong>${campo}</strong>: ${mensagens.join(', ')}</div>`);
+            } else {
+                linhas.push(`<div><strong>${campo}</strong>: ${mensagens}</div>`);
+            }
+        });
+
+        formErrorBox.innerHTML = linhas.join('');
+        formErrorBox.style.display = 'block';
+    }
+
     async function submitTalhao(e) {
         e.preventDefault();
-        const btnSalvar = document.getElementById('btnSalvar');
-        btnSalvar.innerHTML = `<span class="material-symbols-outlined animate-spin">refresh</span>`;
-        btnSalvar.disabled = true;
+        clearFormErrors();
 
-        const payload = {
-            nome: document.getElementById('t_nome').value,
-            area: parseFloat(document.getElementById('t_area').value),
-            tipo_solo: document.getElementById('t_solo').value
-        };
+        const btn = document.getElementById('btnSalvar');
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">refresh</span>';
+        btn.disabled = true;
 
         const lat = document.getElementById('t_lat').value;
         const lon = document.getElementById('t_long').value;
-        if(lat) payload.latitude = parseFloat(lat);
-        if(lon) payload.longitude = parseFloat(lon);
+        const areaProd = document.getElementById('t_area_produtiva').value;
+        const decliv = document.getElementById('t_decliv').value;
+        const ph = document.getElementById('t_ph').value;
+
+        const payload = {
+            nome: document.getElementById('t_nome').value.trim(),
+            codigo: document.getElementById('t_codigo').value.trim(),
+            area: document.getElementById('t_area').value,
+            tipo_solo: document.getElementById('t_solo').value,
+            cultura: document.getElementById('t_cultura').value,
+            safra: document.getElementById('t_safra').value,
+            sistema_cultivo: document.querySelector('input[name="t_sistema"]:checked')?.value || 'direto',
+            irrigacao: document.querySelector('input[name="t_irrigacao"]:checked')?.value || 'sequeiro',
+            pragas_doencas: getTagValues(),
+            observacoes: document.getElementById('t_obs').value.trim(),
+        };
+
+        if (areaProd) payload.area_produtiva = areaProd;
+        if (decliv) payload.declividade = decliv;
+        if (ph) payload.ph_solo = ph;
+        if (lat) payload.latitude = lat;
+        if (lon) payload.longitude = lon;
 
         try {
             const resp = await fetch(`/api/propriedades/${PROP_ID}/talhoes/`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
                 body: JSON.stringify(payload)
             });
 
-            if(resp.ok) {
+            if (resp.ok) {
                 closeModal();
-                loadData(); // refresh on table
+                await loadData();
+                showToast('Talhão cadastrado com sucesso');
             } else {
                 const erro = await resp.json();
-                alert("Erro: " + JSON.stringify(erro));
+                showFormErrors(erro);
             }
         } catch (err) {
-            alert("Erro de conexão.");
+            alert('Erro de conexão com o servidor.');
         } finally {
-            btnSalvar.innerHTML = `Salvar Talhão`;
-            btnSalvar.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Salvar Talhão';
+            btn.disabled = false;
         }
     }
 
-    document.addEventListener("DOMContentLoaded", loadData);
+    async function loadData() {
+        try {
+            const pResp = await fetch(`/api/propriedades/${PROP_ID}/`, {
+                headers: { 'Accept': 'application/json' }
+            });
 
+            if (!pResp.ok) throw new Error('Propriedade não encontrada');
+
+            currentProp = await pResp.json();
+
+            document.getElementById('farmTitle').innerText = currentProp.nome;
+            document.getElementById('breadcrumbFarm').innerText = currentProp.nome;
+            document.getElementById('modalFarmName').innerText = currentProp.nome;
+            document.getElementById('farmLoc').innerText = `${currentProp.municipio.toUpperCase()} / ${currentProp.uf}`;
+
+            const areaFmt = parseFloat(currentProp.area_total).toLocaleString('pt-BR');
+            document.getElementById('farmArea').innerText = `${areaFmt} HA`;
+            document.getElementById('farmAreaBottom').innerHTML = `${areaFmt}<span class="text-xl text-gray-500 ml-1">HA</span>`;
+
+            const tResp = await fetch(`/api/propriedades/${PROP_ID}/talhoes/`, {
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (!tResp.ok) throw new Error('Erro ao carregar talhões');
+
+            const talhoes = await tResp.json();
+
+            document.getElementById('farmTalhoes').innerText = `${talhoes.length} ${talhoes.length === 1 ? 'talhão' : 'talhões'}`;
+            document.getElementById('totalTalhoesMetric').innerHTML = `${talhoes.length}<span class="text-base ml-1 text-primary/60">talhões</span>`;
+
+            renderTabela(talhoes);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    function renderTabela(talhoes) {
+        const tbody = document.getElementById('talhoesTableBody');
+        tbody.innerHTML = '';
+
+        if (talhoes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-gray-500 italic py-12">Nenhum talhão cadastrado. Clique em "Novo Talhão" para começar.</td></tr>';
+            return;
+        }
+
+        talhoes.forEach(t => {
+            const statusHtml = t.is_active
+                ? `<div class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><span class="text-[10px] font-black uppercase text-primary tracking-widest">Ativo</span></div>`
+                : `<div class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-gray-600"></div><span class="text-[10px] font-black uppercase text-gray-500 tracking-widest">Inativo</span></div>`;
+
+            const culturaHtml = t.cultura_display
+                ? `<span class="text-xs font-bold text-primary">${t.cultura_display}</span><br><span class="text-[10px] text-gray-600">${t.safra || ''}</span>`
+                : `<span class="text-gray-600 italic text-xs">—</span>`;
+
+            const irrigHtml = t.irrigacao_display
+                ? `<span class="text-xs">${t.irrigacao_display}</span>`
+                : `<span class="text-gray-600 italic text-xs">—</span>`;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <span class="font-bold">${t.nome}</span>
+                    ${t.codigo ? `<br><span class="text-[10px] font-mono text-gray-600">${t.codigo}</span>` : ''}
+                </td>
+                <td>
+                    <span>${parseFloat(t.area).toLocaleString('pt-BR')}</span>
+                    ${t.area_produtiva ? `<br><span class="text-[10px] text-gray-600">${parseFloat(t.area_produtiva).toLocaleString('pt-BR')} prod.</span>` : ''}
+                </td>
+                <td>
+                    <span>${t.tipo_solo_display}</span>
+                    ${t.ph_solo ? `<br><span class="text-[10px] text-gray-600">pH ${t.ph_solo}</span>` : ''}
+                </td>
+                <td>${culturaHtml}</td>
+                <td>${irrigHtml}</td>
+                <td>${statusHtml}</td>
+                <td class="text-right">
+                    <button onclick="editarTalhao(${t.id})" class="text-gray-400 hover:text-white mx-1 transition-colors">
+                        <span class="material-symbols-outlined text-[1rem]">edit</span>
+                    </button>
+                    <button onclick="inativarTalhao(${t.id})" class="text-gray-400 hover:text-error mx-1 transition-colors">
+                        <span class="material-symbols-outlined text-[1rem]">visibility_off</span>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function openEditPropriedadeModal() {
+        alert('A edição da propriedade ainda será implementada.');
+    }
+
+    function editarTalhao(id) {
+        alert(`A edição do talhão ${id} ainda será implementada.`);
+    }
+
+    async function excluirPropriedade() {
+        if (!confirm('Deseja inativar esta propriedade?')) return;
+
+        try {
+            const resp = await fetch(`/api/propriedades/${PROP_ID}/`, {
+                method: 'DELETE',
+                headers: { 'X-CSRFToken': csrfToken }
+            });
+
+            if (resp.ok) {
+                showToast('Propriedade inativada com sucesso');
+                setTimeout(() => {
+                    window.location.href = "{% url 'web_properties:list' %}";
+                }, 800);
+            } else {
+                const erro = await resp.json();
+                alert('Erro ao excluir propriedade: ' + JSON.stringify(erro));
+            }
+        } catch (err) {
+            alert('Erro de conexão com o servidor.');
+        }
+    }
+
+    async function inativarTalhao(id) {
+        if (!confirm('Inativar este talhão? O histórico será preservado.')) return;
+
+        try {
+            const resp = await fetch(`/api/propriedades/talhoes/${id}/`, {
+                method: 'DELETE',
+                headers: { 'X-CSRFToken': csrfToken }
+            });
+
+            if (resp.ok) {
+                await loadData();
+                showToast('Talhão inativado');
+            } else {
+                const erro = await resp.json();
+                alert('Erro ao inativar talhão: ' + JSON.stringify(erro));
+            }
+        } catch (err) {
+            alert('Erro ao inativar talhão.');
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.style.cssText = 'position:fixed;bottom:2rem;right:2rem;z-index:9999;display:flex;align-items:center;gap:10px;background:#1c1b1b;border:1px solid rgba(84,233,138,0.3);color:white;padding:14px 20px;font-family:Space Grotesk,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;animation:fadeInUp 0.4s ease forwards;';
+        t.innerHTML = `<span class="material-symbols-outlined" style="color:#54e98a;font-size:16px">check_circle</span> ${msg}`;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', loadData);
 </script>
 {% endblock %}

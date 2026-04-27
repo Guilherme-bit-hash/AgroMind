@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Estoque — Selecionar Propriedade{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-card {
+        background: rgba(32, 31, 31, 0.4);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Sidebar Copiada do Dashboard -->
+<aside class="h-screen w-72 fixed left-0 top-0 z-50 bg-[#131313] shadow-[0_24px_48px_rgba(0,0,0,0.4)] flex flex-col py-8 px-6">
+    <div class="mb-12">
+        <h1 class="text-2xl font-black tracking-tighter text-primary font-headline">AgroMind</h1>
+        <p class="font-headline font-bold tracking-tight uppercase text-xs text-gray-500">Rural Intelligence</p>
+    </div>
+
+    <nav class="flex-1 space-y-1" id="sidebar-nav">
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="{% url 'users:dashboard' %}">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="{% url 'web_properties:list' %}">
+            <span class="material-symbols-outlined">landscape</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Propriedades</span>
+        </a>
+        <!-- ... outros modulos resumidos ... -->
+        <a class="flex items-center gap-4 py-3 px-4 text-tertiary border-l-4 border-tertiary-container bg-gradient-to-r from-tertiary-container/10 to-transparent transition-all duration-300 group" href="{% url 'web_estoque:select' %}">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Estoque</span>
+        </a>
+    </nav>
+    <div class="mt-auto pt-8 border-t border-white/5">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full overflow-hidden bg-primary-container flex items-center justify-center">
+                <span class="material-symbols-outlined text-on-primary-container text-xl">person</span>
+            </div>
+            <div class="flex-grow">
+                <p class="text-xs font-bold text-white uppercase tracking-wider truncate">{{ user.name }}</p>
+                <p class="text-[10px] text-primary uppercase tracking-widest font-bold">{{ user.get_role_display }}</p>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- Top Nav Bar -->
+<header class="fixed top-0 right-0 w-[calc(100%-18rem)] z-40 bg-[#131313]/80 backdrop-blur-xl flex justify-between items-center px-10 h-20 border-b border-white/5">
+    <div class="flex items-center gap-4">
+        <h2 class="font-headline font-bold text-xl tracking-tighter text-white">AgroMind Rural</h2>
+    </div>
+    <div class="flex items-center gap-6">
+        <form method="post" action="{% url 'users:logout' %}" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="flex items-center gap-2 text-gray-400 hover:text-error transition-colors duration-200 text-sm font-label">
+                <span class="material-symbols-outlined text-lg">logout</span>
+                <span class="uppercase tracking-wider text-[10px] font-bold">Sair</span>
+            </button>
+        </form>
+    </div>
+</header>
+
+<!-- Main Page Content -->
+<main class="ml-72 min-h-screen pt-28 px-10 pb-20 max-w-[1600px] relative">
+    
+    <div class="flex flex-col mb-10 animate-fade-in-up">
+        <h1 class="font-headline font-bold text-4xl text-white">Estoque de Insumos</h1>
+        <p class="text-gray-400 font-body text-sm mt-2 max-w-xl">
+            Selecione a propriedade comercial para gerenciar o estoque (entradas, saídas e controle mínimo).
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="propertiesGrid">
+        <!-- Loaders placeholders while API loads -->
+        <div class="bg-surface-container-low border border-tertiary/20 rounded-xl h-48 animate-pulse"></div>
+        <div class="bg-surface-container-low border border-tertiary/20 rounded-xl h-48 animate-pulse"></div>
+    </div>
+
+    <!-- Template de Card de Propriedade -->
+    <template id="propertyCardTemplate">
+        <a href="#" class="prop-link block">
+            <div class="bg-surface-container-low border-l-4 border-l-tertiary border border-white/5 rounded-r-xl p-6 relative flex flex-col justify-between group hover:-translate-y-1 hover:border-tertiary/50 transition-all cursor-pointer h-full">
+                
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-tertiary text-xl">landscape</span>
+                        <span class="text-[10px] uppercase font-black text-tertiary tracking-wider prop-locale">Matão / SP</span>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-500 group-hover:text-tertiary transition-colors">arrow_forward</span>
+                </div>
+                
+                <h3 class="font-headline font-bold text-2xl text-white mb-2 prop-name">Nome da Fazenda</h3>
+                <p class="text-xs text-gray-500 font-body mb-4 prop-area">500 HA</p>
+                
+                <div class="absolute bottom-0 right-0 w-32 h-32 opacity-5 pointer-events-none overflow-hidden rounded-br-xl">
+                    <span class="material-symbols-outlined text-[150px] translate-y-10 translate-x-10">inventory_2</span>
+                </div>
+            </div>
+        </a>
+    </template>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function carregarPropriedades() {
+        try {
+            const resp = await fetch("/api/propriedades/", {
+                headers: { "Accept": "application/json" }
+            });
+
+            if (!resp.ok) throw new Error("Falha ao buscar propriedades.");
+            const propriedades = await resp.json();
+            
+            // Auto redirect se tiver apenas 1 propriedade!
+            if (propriedades.length === 1) {
+                window.location.href = `/estoque/${propriedades[0].id}/`;
+                return;
+            }
+
+            renderizarGrid(propriedades);
+
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao carregar propriedades. Atualize a página.");
+        }
+    }
+
+    function renderizarGrid(props) {
+        const grid = document.getElementById('propertiesGrid');
+        grid.innerHTML = "";
+        
+        if (props.length === 0) {
+            grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Nenhuma propriedade encontrada. Vá no módulo Propriedades e cadastre uma.</div>`;
+            return;
+        }
+
+        const cardTemplate = document.getElementById('propertyCardTemplate');
+        
+        props.forEach(p => {
+            const clone = cardTemplate.content.cloneNode(true);
+            clone.querySelector('.prop-name').textContent = p.nome;
+            clone.querySelector('.prop-locale').textContent = p.municipio.toUpperCase() + ' / ' + p.uf;
+            clone.querySelector('.prop-area').textContent = parseFloat(p.area_total).toLocaleString('pt-BR') + ' HA';
+            clone.querySelector('.prop-link').href = `/estoque/${p.id}/`;
+            grid.appendChild(clone);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        carregarPropriedades();
+    });
+</script>
+{% endblock %}

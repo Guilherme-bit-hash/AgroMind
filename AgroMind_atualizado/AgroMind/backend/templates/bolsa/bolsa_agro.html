@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}Bolsa Agro — AgroMind Rural{% endblock %}
+
+{% block extra_css %}
+<style>
+  body { background: #f5f5f0; }
+  .sidebar { width: 220px; min-height: 100vh; background: #fff; border-right: 1px solid #e8ede4; }
+  .sidebar-logo { display:flex; align-items:center; gap:10px; padding: 28px 20px 20px; }
+  .sidebar-logo-icon { width:36px; height:36px; background:#2d6a2d; border-radius:10px; display:flex; align-items:center; justify-content:center; }
+  .nav-item { display:flex; align-items:center; gap:12px; padding:10px 20px; color:#6b8a6b; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; text-decoration:none; transition:all 0.2s; }
+  .nav-item:hover { color:#2d6a2d; background:#f0f7f0; }
+  .nav-item.active { color:#2d6a2d; background:#e8f5e8; border-left:3px solid #2d6a2d; }
+  .nav-item svg { width:18px; height:18px; flex-shrink:0; }
+  .card { background:#fff; border-radius:16px; border:1px solid #e8ede4; overflow:hidden; }
+  .card-sm { background:#fff; border-radius:12px; border:1px solid #e8ede4; padding:16px 18px; }
+  .tab { padding:8px 18px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; text-decoration:none; color:#6b8a6b; background:transparent; border:1px solid transparent; transition:all 0.2s; }
+  .tab:hover { color:#2d6a2d; background:#f0f7f0; }
+  .tab.active { color:#fff; background:#2d6a2d; border-color:#2d6a2d; }
+  .badge-up { background:#e8f5e8; color:#2d6a2d; font-size:11px; font-weight:800; padding:2px 8px; border-radius:6px; }
+  .badge-down { background:#fde8e8; color:#c0392b; font-size:11px; font-weight:800; padding:2px 8px; border-radius:6px; }
+  .badge-neutral { background:#f0f0f0; color:#555; font-size:11px; font-weight:700; padding:2px 8px; border-radius:6px; }
+  table { width:100%; border-collapse:collapse; }
+  th { font-size:10px; font-weight:800; color:#7a9a7a; text-transform:uppercase; letter-spacing:0.1em; padding:10px 14px; border-bottom:1px solid #e8ede4; text-align:left; }
+  td { font-size:13px; color:#1a3a1a; padding:12px 14px; border-bottom:1px solid #f0f5f0; }
+  tr:hover td { background:#fafef8; }
+  .trend-line { width:80px; height:30px; }
+  .search-box { border:1px solid #e8ede4; border-radius:8px; padding:6px 14px; font-size:12px; color:#444; background:#f9faf8; outline:none; width:180px; }
+  .search-box:focus { border-color:#2d6a2d; }
+  .icon-btn { width:34px; height:34px; border-radius:8px; border:1px solid #e8ede4; background:#f9faf8; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#6b8a6b; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div style="display:flex; min-height:100vh; background:#f5f5f0;">
+
+  <!-- Sidebar (same as dashboard) -->
+  <aside class="sidebar" style="position:fixed; top:0; left:0; height:100vh; display:flex; flex-direction:column; z-index:60;">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M17 8C8 10 5.9 16.17 3.82 21L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-8 2-.5-3-4-3-5-3s-2 1-2 1c2 0 4 1 4 1-2 1-5 1-7 3C3 8.18 3 11 5 11c0 0 2-3 12-3z"/></svg>
+      </div>
+      <div>
+        <div style="font-size:18px; font-weight:900; color:#1a3a1a; letter-spacing:-0.5px;">AgroMind</div>
+        <div style="font-size:9px; color:#7a9a7a; font-weight:700; letter-spacing:0.15em; text-transform:uppercase;">Rural Intelligence</div>
+      </div>
+    </div>
+
+    <nav style="flex:1; padding:8px 0; overflow-y:auto;">
+      <a href="{% url 'users:dashboard' %}" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+        Dashboard
+      </a>
+      <a href="{% url 'web_properties:list' %}" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+        Propriedades
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 9.5c-1.03 0-1.9.52-2.43 1.3L14 9.14V7c0-1.66-1.34-3-3-3S8 5.34 8 7v2.14L4.93 10.8A2.99 2.99 0 002.5 9.5C1.12 9.5 0 10.62 0 12s1.12 2.5 2.5 2.5c1.16 0 2.15-.78 2.42-1.86l2.93-1.31C8.11 12.39 9.5 13.5 11 13.5s2.89-1.11 3.15-2.17l2.93 1.31c.27 1.08 1.26 1.86 2.42 1.86C20.88 14.5 22 13.38 22 12s-1.12-2.5-2.5-2.5z"/></svg>
+        Simulação
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
+        Clima
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+        Financeiro
+      </a>
+      <a href="{% url 'bolsa:bolsa_agro' %}" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+        Bolsa Agro
+      </a>
+      <a href="{% url 'web_estoque:select' %}" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.36C18 2.53 15.95.5 13.36.5c-1.54 0-2.87.77-3.75 1.96l-.61.84-.61-.84C7.51 1.27 6.18.5 4.64.5 2.05.5 0 2.53 0 5.14c0 .48.08.92.18 1.36H0l-2 8h24l-2-8zM20 22H4v-8h16v8z"/></svg>
+        Estoque
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        Colaboradores
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.95-2.05L6.64 18.36C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+        Histórico
+      </a>
+    </nav>
+
+    <!-- User + logout -->
+    <div style="padding:16px 20px; border-top:1px solid #e8ede4; background:#fafef8;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:36px; height:36px; border-radius:50%; background:#e8f5e8; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="#2d6a2d"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+        <div>
+          <div style="font-size:12px; font-weight:800; color:#1a3a1a;">{{ user.name }}</div>
+          <div style="font-size:10px; color:#7a9a7a; font-weight:600; text-transform:uppercase; letter-spacing:0.07em;">{{ user.get_role_display }}</div>
+        </div>
+        <form method="post" action="{% url 'users:logout' %}" style="margin-left:auto;">
+          {% csrf_token %}
+          <button type="submit" style="border:none;background:transparent;cursor:pointer;color:#c0392b;padding:4px;" title="Sair">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Farm art -->
+    <div style="height:90px; background:linear-gradient(to top, #e8f5e8 0%, transparent 100%); position:relative; overflow:hidden;">
+      <svg viewBox="0 0 220 90" style="position:absolute;bottom:0;left:0;width:100%;opacity:0.4;">
+        <path d="M0 60 Q30 35 60 50 Q90 25 120 45 Q150 30 180 42 Q200 38 220 45 L220 90 L0 90Z" fill="#4a9a4a"/>
+        <path d="M0 72 Q40 58 80 65 Q120 53 160 63 Q190 58 220 61 L220 90 L0 90Z" fill="#2d6a2d"/>
+      </svg>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main style="margin-left:220px; flex:1; display:flex; flex-direction:column;">
+
+    <!-- Topbar -->
+    <div style="background:#fff; border-bottom:1px solid #e8ede4; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 28px; position:sticky; top:0; z-index:50;">
+      <div>
+        <h1 style="font-size:22px; font-weight:900; color:#1a3a1a; letter-spacing:-0.5px; line-height:1;">Bolsa Agro</h1>
+        <p style="font-size:12px; color:#7a9a7a; font-weight:600; margin-top:1px;">Mercado Agro em Tempo Real</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:11px; color:#7a9a7a; font-weight:600;">Atualizado agora &bull; Última cotação: 24 Abril 2024 · 11:52</span>
+        <input class="search-box" type="text" placeholder="🔍 Buscar ativo...">
+        <div class="icon-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        </div>
+        <div class="icon-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Landscape banner -->
+    <div style="height:120px; background:linear-gradient(to right, #e8f5e8 0%, #c8e6c8 40%, #a8d8a8 100%); position:relative; overflow:hidden;">
+      <div style="position:absolute;bottom:0;left:0;right:0;height:60px;">
+        <svg viewBox="0 0 1200 60" preserveAspectRatio="none" style="width:100%;height:100%;opacity:0.5;">
+          <path d="M0 30 Q100 10 200 25 Q300 40 400 20 Q500 5 600 18 Q700 30 800 15 Q900 2 1000 20 Q1100 35 1200 22 L1200 60 L0 60Z" fill="#2d6a2d"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <div style="padding:24px 28px; flex:1;">
+
+      <!-- Tabs -->
+      <div style="display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap;">
+        <a href="#" class="tab active" id="tab-graos" onclick="setTab(this)">🌾 Grãos</a>
+        <a href="#" class="tab" onclick="setTab(this)">🐄 Pecuária</a>
+        <a href="#" class="tab" onclick="setTab(this)">🧪 Insumos</a>
+        <a href="#" class="tab" onclick="setTab(this)">💵 Moedas</a>
+        <a href="#" class="tab" onclick="setTab(this)">⚡ Energia</a>
+        <a href="#" class="tab" onclick="setTab(this)">🚛 Frete</a>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 320px; gap:24px;">
+
+        <!-- Left column -->
+        <div>
+          <!-- Main card + small cards -->
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr; gap:16px; margin-bottom:24px;">
+
+            <!-- Soja main card -->
+            <div class="card" style="grid-column:1/3; padding:22px; position:relative; overflow:hidden;">
+              <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#f0faf0,#e0f5e0);z-index:0;"></div>
+              <div style="position:relative;z-index:1;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:20px;">🌱</span>
+                    <span style="font-size:15px; font-weight:900; color:#1a3a1a;">Soja</span>
+                  </div>
+                  <span class="badge-up">+2.6% ALTA SEMANAL</span>
+                </div>
+                <div style="font-size:40px; font-weight:900; color:#1a3a1a; line-height:1;"><span style="font-size:22px;font-weight:700;">R$</span> 162,40</div>
+                <div style="font-size:13px; color:#2d6a2d; font-weight:800; margin-top:4px;">+1.8% hoje</div>
+                <div style="font-size:11px; color:#7a9a7a; margin-top:2px;">+2.5% semana · +2.1% alta tendência · R$179,20 máx.</div>
+                <!-- Mini chart -->
+                <svg viewBox="0 0 200 50" style="width:100%;height:50px;margin-top:14px;" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="soja-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#2d6a2d" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#2d6a2d" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M0 42 Q25 38 50 32 Q75 26 100 22 Q125 18 150 12 Q175 8 200 5" stroke="#2d6a2d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                  <path d="M0 42 Q25 38 50 32 Q75 26 100 22 Q125 18 150 12 Q175 8 200 5 L200 50 L0 50Z" fill="url(#soja-grad)"/>
+                  <circle cx="200" cy="5" r="4" fill="#2d6a2d"/>
+                </svg>
+                <div style="display:flex; justify-content:space-between; font-size:10px; color:#9ab09a; margin-top:4px;">
+                  <span>Abr 05</span><span>Abr 01</span><span>Abr 08</span><span>Abr 15</span><span>Hoje</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Small cards -->
+            <div class="card-sm">
+              <div style="font-size:12px;">🌽 Milho</div>
+              <div style="font-size:20px; font-weight:900; color:#1a3a1a; margin-top:4px;">R$70,50</div>
+              <div style="font-size:11px; color:#2d6a2d; font-weight:700;">+2.6% hoje</div>
+            </div>
+            <div class="card-sm">
+              <div style="font-size:12px;">🌾 Arroz</div>
+              <div style="font-size:20px; font-weight:900; color:#1a3a1a; margin-top:4px;">R$61,80</div>
+              <div style="font-size:11px; color:#2d6a2d; font-weight:700;">+1.0% hoje</div>
+            </div>
+            <div class="card-sm">
+              <div style="font-size:12px;">☕ Café</div>
+              <div style="font-size:20px; font-weight:900; color:#1a3a1a; margin-top:4px;">R$920,00</div>
+              <div style="font-size:11px; color:#c0392b; font-weight:700;">-3.2% hoje</div>
+            </div>
+
+            <div class="card-sm">
+              <div style="font-size:12px;">🧵 Algodão</div>
+              <div style="font-size:20px; font-weight:900; color:#1a3a1a; margin-top:4px;">R$4,73</div>
+              <div style="font-size:11px; color:#2d6a2d; font-weight:700;">+0.4% hoje</div>
+            </div>
+            <div class="card-sm">
+              <div style="font-size:12px;">🌾 Trigo</div>
+              <div style="font-size:20px; font-weight:900; color:#1a3a1a; margin-top:4px;">R$62,30</div>
+              <div style="font-size:11px; color:#2d6a2d; font-weight:700;">+0.4% hoje</div>
+            </div>
+            <div class="card-sm">
+              <div style="font-size:12px;">🐂 Arroba Boi</div>
+              <div style="font-size:20px; font-weight:900; color:#1a3a1a; margin-top:4px;">R$220,00</div>
+              <div style="font-size:11px; color:#2d6a2d; font-weight:700;">+0.8% hoje</div>
+            </div>
+          </div>
+
+          <!-- Visão Geral table -->
+          <div class="card" style="padding:22px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+              <h2 style="font-size:17px; font-weight:900; color:#1a3a1a;">Visão Geral</h2>
+              <div style="display:flex; gap:8px;">
+                <span style="font-size:12px; color:#7a9a7a; cursor:pointer;">‹</span>
+                <span style="font-size:12px; color:#7a9a7a; cursor:pointer;">›</span>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Ativo</th>
+                  <th>Preço</th>
+                  <th>Variação</th>
+                  <th>Máx. 42 Semanas</th>
+                  <th>Mín.</th>
+                  <th>Volume</th>
+                  <th>Tendência</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span style="display:flex;align-items:center;gap:8px;font-weight:700;">🌱 Soja</span></td>
+                  <td style="font-weight:800;">R$162,40</td>
+                  <td><span class="badge-up">+1.8% ↑</span></td>
+                  <td>R$187.775,00</td>
+                  <td>122.371</td>
+                  <td>223.000</td>
+                  <td><svg class="trend-line" viewBox="0 0 80 30" preserveAspectRatio="none"><polyline points="0,28 20,22 40,18 60,10 80,4" stroke="#2d6a2d" stroke-width="2" fill="none"/></svg></td>
+                </tr>
+                <tr>
+                  <td><span style="display:flex;align-items:center;gap:8px;font-weight:700;">🌽 Milho</span></td>
+                  <td style="font-weight:800;">R$70,00</td>
+                  <td><span class="badge-up">+1.7% ↑</span></td>
+                  <td>R$157.225,00</td>
+                  <td>131.361</td>
+                  <td>-13.000</td>
+                  <td><svg class="trend-line" viewBox="0 0 80 30" preserveAspectRatio="none"><polyline points="0,25 20,20 40,22 60,15 80,8" stroke="#2d6a2d" stroke-width="2" fill="none"/></svg></td>
+                </tr>
+                <tr>
+                  <td><span style="display:flex;align-items:center;gap:8px;font-weight:700;">🌾 Trigo</span></td>
+                  <td style="font-weight:800;">R$411,80</td>
+                  <td><span class="badge-up">+0.3% ↑</span></td>
+                  <td>R$126.045,67</td>
+                  <td>139.021</td>
+                  <td>139.000</td>
+                  <td><svg class="trend-line" viewBox="0 0 80 30" preserveAspectRatio="none"><polyline points="0,22 20,20 40,19 60,18 80,16" stroke="#7ab07a" stroke-width="2" fill="none"/></svg></td>
+                </tr>
+                <tr>
+                  <td><span style="display:flex;align-items:center;gap:8px;font-weight:700;">🐂 Arroba do Boi</span></td>
+                  <td style="font-weight:800;">R$20,00</td>
+                  <td><span class="badge-up">+0.4% ↑</span></td>
+                  <td>R$124.445,97</td>
+                  <td>121.173</td>
+                  <td>261.000</td>
+                  <td><svg class="trend-line" viewBox="0 0 80 30" preserveAspectRatio="none"><polyline points="0,25 20,22 40,26 60,20 80,15" stroke="#c0392b" stroke-width="2" fill="none"/></svg></td>
+                </tr>
+                <tr>
+                  <td><span style="display:flex;align-items:center;gap:8px;font-weight:700;">☕ Café</span></td>
+                  <td style="font-weight:800;">R$970,00</td>
+                  <td><span class="badge-down">-1.2% ↓</span></td>
+                  <td>R$152.607,98</td>
+                  <td>100.073</td>
+                  <td>347.000</td>
+                  <td><svg class="trend-line" viewBox="0 0 80 30" preserveAspectRatio="none"><polyline points="0,10 20,14 40,12 60,18 80,22" stroke="#c0392b" stroke-width="2" fill="none"/></svg></td>
+                </tr>
+                <tr>
+                  <td><span style="display:flex;align-items:center;gap:8px;font-weight:700;">🧵 Algodão</span></td>
+                  <td style="font-weight:800;">R$6,79</td>
+                  <td><span class="badge-up">+0.2% ↑</span></td>
+                  <td>R$101.007,08</td>
+                  <td>134.193</td>
+                  <td>136.000</td>
+                  <td><svg class="trend-line" viewBox="0 0 80 30" preserveAspectRatio="none"><polyline points="0,26 20,22 40,20 60,16 80,12" stroke="#2d6a2d" stroke-width="2" fill="none"/></svg></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right panel -->
+        <div style="display:flex; flex-direction:column; gap:18px;">
+
+          <!-- Alertas -->
+          <div class="card" style="padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <h3 style="font-size:15px; font-weight:900; color:#1a3a1a;">Alertas e Recomendações</h3>
+              <span style="font-size:12px; color:#7a9a7a; cursor:pointer;">›</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="display:flex; align-items:flex-start; gap:10px;">
+                <span style="color:#2d6a2d; margin-top:1px; flex-shrink:0;">✓</span>
+                <div>
+                  <span style="font-size:13px; color:#1a3a1a; font-weight:600;">Soja em alta há 3 dias</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:flex-start; gap:10px;">
+                <span style="color:#2d6a2d; margin-top:1px; flex-shrink:0;">✓</span>
+                <div>
+                  <span style="font-size:13px; color:#1a3a1a; font-weight:600;">Arroba do boi próxima da máxima do mês</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:flex-start; gap:10px;">
+                <span style="color:#c0392b; margin-top:1px; flex-shrink:0;">✗</span>
+                <div>
+                  <span style="font-size:13px; color:#1a3a1a; font-weight:600;">Milho abaixo do preço ideal de venda</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- More alerts -->
+          <div class="card" style="padding:20px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+              <span style="font-size:20px;">🌱</span>
+              <h3 style="font-size:15px; font-weight:900; color:#1a3a1a;">Alertas e Recomendações</h3>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="color:#2d6a2d;">✓</span>
+                <span style="font-size:13px; color:#1a3a1a; font-weight:600;">Soja em alta há 3 dias</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="color:#2d6a2d;">✓</span>
+                <span style="font-size:13px; color:#1a3a1a; font-weight:600;">Arroba do boi próxima da máxima do mês</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cenário Favorável -->
+          <div class="card" style="background:linear-gradient(135deg,#e8f5e8,#c8e6c8); padding:20px; border:none;">
+            <div style="font-size:10px; font-weight:800; color:#2d6a2d; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:8px;">Cenário Favorável</div>
+            <div style="font-size:36px; font-weight:900; color:#1a3a1a; line-height:1; margin-bottom:10px;">Venda</div>
+            <p style="font-size:12px; color:#4a7a4a; font-weight:600; line-height:1.5;">Preços estão acima do custo, gerando uma margem positiva. Momento com tendência de alta.</p>
+            <div style="margin-top:14px; font-size:10px; font-weight:800; color:#2d6a2d; text-transform:uppercase; letter-spacing:0.1em;">⭐ Recomendação: Venda</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function setTab(el) {
+  event.preventDefault();
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+{% endblock %}

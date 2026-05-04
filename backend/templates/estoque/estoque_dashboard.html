@@ -307,16 +307,7 @@
         return parseFloat(num).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    // Modal Insumo
-    function openModalInsumo(id = null) {
-        document.getElementById('formInsumo').reset();
-        document.getElementById('i_id').value = id || "";
-        document.getElementById('modalInsumo').classList.remove('hidden');
-        setTimeout(() => {
-            document.getElementById('modalInsumo').classList.remove('opacity-0');
-            document.getElementById('dialogInsumo').classList.remove('scale-95');
-        }, 10);
-    }
+    // Modal Insumo → função openModalInsumo definida após submitInsumo
 
     function closeModalInsumo() {
         document.getElementById('modalInsumo').classList.add('opacity-0');
@@ -394,7 +385,7 @@
                 const prop = await resp.json();
                 const sel = document.getElementById('m_s_talhao');
                 sel.innerHTML = '<option value="">Selecione o talhão destino...</option>';
-                prop.talhoes.forEach(t => {
+                prop.talhoes.filter(t => t.is_active).forEach(t => {
                     sel.innerHTML += `<option value="${t.id}">${t.nome} (${t.area}ha)</option>`;
                 });
             }
@@ -447,7 +438,13 @@
                     <td class="font-headline font-bold text-primary">R$ ${formatNumber(custoTotal)}</td>
                     <td>${statusBadge}</td>
                     <td class="text-right whitespace-nowrap">
-                        <button onclick="openModalMov(${i.id}, '${i.nome.replace(/'/g,"\\'")}', ${preco})" class="text-xs text-on-tertiary bg-tertiary/90 hover:bg-tertiary font-bold uppercase tracking-wider py-2 px-4 rounded transition-colors mr-2">Estoque +/-</button>
+                        <button onclick="openModalMov(${i.id}, '${i.nome.replace(/'/g,"\\'")}', ${preco})" class="text-xs text-on-tertiary bg-tertiary/90 hover:bg-tertiary font-bold uppercase tracking-wider py-2 px-4 rounded transition-colors mr-1">Movimentar</button>
+                        <button onclick="openEditInsumo(${i.id})" class="text-gray-400 hover:text-white transition-colors mx-1" title="Editar">
+                            <span class="material-symbols-outlined text-[1rem]">edit</span>
+                        </button>
+                        <button onclick="excluirInsumo(${i.id}, '${i.nome.replace(/'/g,"\\'")}')" class="text-gray-400 hover:text-error transition-colors mx-1" title="Excluir">
+                            <span class="material-symbols-outlined text-[1rem]">delete</span>
+                        </button>
                     </td>
                 `;
                 tb.appendChild(tr);
@@ -501,6 +498,56 @@
         
         btn.disabled = false; btn.innerHTML = `Salvar`;
     }
+
+    async function openEditInsumo(id) {
+        try {
+            const resp = await fetch(`${API_BASE}${id}/`, { headers: { 'Accept': 'application/json' } });
+            if (!resp.ok) { alert('Insumo não encontrado.'); return; }
+            const i = await resp.json();
+
+            document.getElementById('i_id').value = i.id;
+            document.getElementById('i_nome').value = i.nome;
+            document.getElementById('i_tipo').value = i.tipo;
+            document.getElementById('i_unidade').value = i.unidade_medida;
+            document.getElementById('i_preco').value = i.preco_unitario;
+            document.getElementById('i_minimo').value = i.estoque_minimo;
+
+            document.querySelector('#modalInsumo h2').innerText = 'Editar Insumo';
+            document.getElementById('modalInsumoDesc').innerText = 'Atualize os dados do insumo.';
+            openModalInsumo(i.id);
+        } catch (err) { alert('Erro ao carregar insumo.'); }
+    }
+
+    async function excluirInsumo(id, nome) {
+        if (!confirm(`Deseja excluir (inativar) o insumo "${nome}"?`)) return;
+        try {
+            const resp = await fetch(`${API_BASE}${id}/`, {
+                method: 'DELETE',
+                headers: { 'X-CSRFToken': csrfToken }
+            });
+            if (resp.ok || resp.status === 204) {
+                carregarInsumos();
+            } else {
+                const erro = await resp.json();
+                alert('Erro: ' + JSON.stringify(erro));
+            }
+        } catch (err) { alert('Erro de conexão.'); }
+    }
+
+    function openModalInsumo(id = null) {
+        if (!id) {
+            document.getElementById('formInsumo').reset();
+            document.getElementById('i_id').value = '';
+            document.querySelector('#modalInsumo h2').innerText = 'Cadastrar Insumo';
+            document.getElementById('modalInsumoDesc').innerText = 'As quantidades são inicializadas em 0. Registre depois uma "Entrada".';
+        }
+        document.getElementById('modalInsumo').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modalInsumo').classList.remove('opacity-0');
+            document.getElementById('dialogInsumo').classList.remove('scale-95');
+        }, 10);
+    }
+
 
     async function submitMovimentacao(e) {
         e.preventDefault();

@@ -347,8 +347,8 @@
                 <span class="material-symbols-outlined text-sm">edit</span> Editar
             </button>
 
-            <button onclick="excluirPropriedade()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-400/20 px-5 py-3 text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-colors rounded-lg">
-                <span class="material-symbols-outlined text-sm">delete</span> Excluir
+            <button id="btnToggleProp" onclick="togglePropriedadeStatus()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-400/20 px-5 py-3 text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-colors rounded-lg">
+                <span class="material-symbols-outlined text-sm">visibility_off</span> <span id="btnTogglePropLabel">Inativar</span>
             </button>
         </div>
 
@@ -425,9 +425,8 @@
 
             <div class="flex gap-0 border-b border-white/5 overflow-x-auto">
                 <button type="button" class="modal-tab active" onclick="switchTab('identificacao', this)">Identificação</button>
-                <button type="button" class="modal-tab" onclick="switchTab('solo', this)">Área e solo</button>
+                <button type="button" class="modal-tab" onclick="switchTab('solo', this)">Área, solo e localização</button>
                 <button type="button" class="modal-tab" onclick="switchTab('cultura', this)">Cultura e manejo</button>
-                <button type="button" class="modal-tab" onclick="switchTab('localizacao', this)">Localização</button>
             </div>
         </div>
 
@@ -512,6 +511,23 @@
                                 <input type="number" id="t_decliv" step="0.1" min="0" max="100" class="custom-input" placeholder="0" />
                                 <span>%</span>
                             </div>
+                        </div>
+
+                        <div class="md:col-span-2 mt-4 bg-primary/5 border border-primary/15 p-4 flex items-start gap-3 rounded-lg">
+                            <span class="material-symbols-outlined text-primary text-sm mt-0.5">pin_drop</span>
+                            <p class="text-[11px] text-gray-400 font-body leading-relaxed">
+                                Coordenadas opcionais para georreferenciamento do talhão.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="field-label">Latitude</label>
+                            <input type="number" step="0.000001" id="t_lat" class="custom-input" placeholder="-15.780100" />
+                        </div>
+
+                        <div>
+                            <label class="field-label">Longitude</label>
+                            <input type="number" step="0.000001" id="t_long" class="custom-input" placeholder="-47.929200" />
                         </div>
                     </div>
                 </div>
@@ -609,36 +625,7 @@
                     </div>
                 </div>
 
-                <div id="tab-localizacao" class="tab-panel">
-                    <div class="section-title">
-                        <div class="icon-box">
-                            <span class="material-symbols-outlined text-primary text-sm">pin_drop</span>
-                        </div>
-                        <div>
-                            <span class="kicker">04</span>
-                            <span class="title">Localização</span>
-                        </div>
-                    </div>
 
-                    <div class="bg-primary/5 border border-primary/15 p-4 mb-6 flex items-start gap-3 rounded-lg">
-                        <span class="material-symbols-outlined text-primary text-sm mt-0.5">info</span>
-                        <p class="text-[11px] text-gray-400 font-body leading-relaxed">
-                            Coordenadas opcionais permitem maior precisão no monitoramento climático e georreferenciamento do talhão.
-                        </p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
-                        <div>
-                            <label class="field-label">Latitude</label>
-                            <input type="number" step="0.000001" id="t_lat" class="custom-input" placeholder="-15.780100" />
-                        </div>
-
-                        <div>
-                            <label class="field-label">Longitude</label>
-                            <input type="number" step="0.000001" id="t_long" class="custom-input" placeholder="-47.929200" />
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div class="px-8 pb-8 pt-4 border-t border-white/5 flex items-center justify-between">
@@ -664,6 +651,125 @@
         </form>
     </div>
 </div>
+
+<!-- Modal Editar Propriedade -->
+<div id="modalEditPropDetail" class="fixed inset-0 z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeEditPropModal()"></div>
+    <div class="glass-modal w-full max-w-2xl relative rounded-2xl p-8 mx-4 transform scale-95 transition-transform duration-300" id="editPropDialogDetail">
+        <h2 class="font-headline font-bold text-3xl text-white mb-2">Editar Propriedade</h2>
+        <p class="text-sm text-gray-400 mb-8">Atualize os dados da fazenda.</p>
+        <form id="editPropFormDetail" onsubmit="submitEditProp(event)">
+            <div class="space-y-6">
+                <div>
+                    <label class="field-label">Nome da Fazenda <span class="req">*</span></label>
+                    <input type="text" id="ep_nome" required class="custom-input" />
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="field-label">Área Total (HA) <span class="req">*</span></label>
+                        <input type="number" step="0.01" id="ep_area" required class="custom-input" />
+                    </div>
+                    <div>
+                        <label class="field-label">Município <span class="req">*</span></label>
+                        <input type="text" id="ep_municipio" required class="custom-input" />
+                    </div>
+                </div>
+                <div>
+                    <label class="field-label">UF <span class="req">*</span></label>
+                    <select id="ep_uf" required class="custom-input appearance-none">
+                        <option value="" disabled>Selecione</option>
+                        <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option>
+                        <option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option>
+                        <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
+                        <option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
+                        <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option>
+                        <option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option>
+                        <option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option>
+                        <option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
+                        <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="field-label">Latitude</label>
+                        <input type="number" step="0.000001" id="ep_lat" class="custom-input" />
+                    </div>
+                    <div>
+                        <label class="field-label">Longitude</label>
+                        <input type="number" step="0.000001" id="ep_long" class="custom-input" />
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-6 pt-10">
+                <button type="button" onclick="closeEditPropModal()" class="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors">Cancelar</button>
+                <button type="submit" id="btnEditPropSave" class="bg-primary hover:bg-primary-fixed-dim text-on-primary text-sm font-bold uppercase tracking-wider py-3 px-8 rounded-lg shadow-[0_0_15px_rgba(84,233,138,0.3)] transition-all">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Editar Talhão -->
+<div id="modalEditTalhao" class="fixed inset-0 z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeEditTalhaoModal()"></div>
+    <div class="glass-modal w-full max-w-2xl relative rounded-2xl p-8 mx-4 transform scale-95 transition-transform duration-300" id="editTalhaoDialog">
+        <h2 class="font-headline font-bold text-3xl text-white mb-2">Editar Talhão</h2>
+        <p class="text-sm text-gray-400 mb-8">Atualize os dados agronômicos.</p>
+        <form id="editTalhaoForm" onsubmit="submitEditTalhao(event)">
+            <input type="hidden" id="et_id" value="">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <div>
+                    <label class="field-label">Nome <span class="req">*</span></label>
+                    <input type="text" id="et_nome" required class="custom-input" />
+                </div>
+                <div>
+                    <label class="field-label">Código interno</label>
+                    <input type="text" id="et_codigo" class="custom-input" />
+                </div>
+                <div>
+                    <label class="field-label">Área (HA) <span class="req">*</span></label>
+                    <input type="number" step="0.01" id="et_area" required class="custom-input" />
+                </div>
+                <div>
+                    <label class="field-label">Área produtiva (HA)</label>
+                    <input type="number" step="0.01" id="et_area_produtiva" class="custom-input" />
+                </div>
+                <div>
+                    <label class="field-label">Tipo de solo <span class="req">*</span></label>
+                    <select id="et_solo" required class="custom-input appearance-none">
+                        <option value="argiloso">Argiloso</option><option value="arenoso">Arenoso</option>
+                        <option value="siltoso">Siltoso</option><option value="humifero">Humífero</option>
+                        <option value="calcario">Calcário</option><option value="laterita">Laterita</option>
+                        <option value="misto">Misto</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Cultura</label>
+                    <select id="et_cultura" class="custom-input appearance-none">
+                        <option value="">Nenhuma</option>
+                        <option value="soja">Soja</option><option value="milho">Milho</option>
+                        <option value="cana">Cana</option><option value="cafe">Café</option>
+                        <option value="algodao">Algodão</option><option value="feijao">Feijão</option>
+                        <option value="trigo">Trigo</option><option value="sorgo">Sorgo</option>
+                        <option value="pastagem">Pastagem</option><option value="outro">Outro</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Safra</label>
+                    <input type="text" id="et_safra" class="custom-input" />
+                </div>
+                <div>
+                    <label class="field-label">pH do solo</label>
+                    <input type="number" step="0.1" id="et_ph" class="custom-input" />
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-6 pt-10 mt-4">
+                <button type="button" onclick="closeEditTalhaoModal()" class="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors">Cancelar</button>
+                <button type="submit" id="btnEditTalhaoSave" class="bg-primary hover:bg-primary-fixed-dim text-on-primary text-sm font-bold uppercase tracking-wider py-3 px-8 rounded-lg shadow-[0_0_15px_rgba(84,233,138,0.3)] transition-all">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -685,7 +791,7 @@
 
     let currentProp = null;
 
-    const TAB_ORDER = ['identificacao', 'solo', 'cultura', 'localizacao'];
+    const TAB_ORDER = ['identificacao', 'solo', 'cultura'];
     let currentTabIdx = 0;
 
     function switchTab(name, btn) {
@@ -698,6 +804,7 @@
     }
 
     function updateNavBtns() {
+        const modalTabs = document.querySelectorAll('#modalNewTalhao .modal-tab');
         document.getElementById('btnPrev').classList.toggle('hidden', currentTabIdx === 0);
         document.getElementById('btnNext').classList.toggle('hidden', currentTabIdx === TAB_ORDER.length - 1);
     }
@@ -754,7 +861,7 @@
             modal.classList.remove('opacity-0');
             dialog.classList.remove('scale-95');
         }, 10);
-        switchTab('identificacao', document.querySelectorAll('.modal-tab')[0]);
+        switchTab('identificacao', document.querySelectorAll('#modalNewTalhao .modal-tab')[0]);
     }
 
     function closeModal() {
@@ -792,6 +899,24 @@
     async function submitTalhao(e) {
         e.preventDefault();
         clearFormErrors();
+
+        // Cross-tab validation
+        const erros = [];
+        const nome = document.getElementById('t_nome').value.trim();
+        const area = document.getElementById('t_area').value;
+        const solo = document.getElementById('t_solo').value;
+        if (!nome) erros.push({tab: 'identificacao', msg: 'Nome do talhão é obrigatório.'});
+        if (!area || parseFloat(area) <= 0) erros.push({tab: 'solo', msg: 'Área do talhão é obrigatória e deve ser maior que zero.'});
+        if (!solo) erros.push({tab: 'solo', msg: 'Tipo de solo é obrigatório.'});
+
+        if (erros.length > 0) {
+            showFormErrors({validacao: erros.map(e => e.msg)});
+            const firstTab = erros[0].tab;
+            const tabs = document.querySelectorAll('#modalNewTalhao .modal-tab');
+            const tabIdx = TAB_ORDER.indexOf(firstTab);
+            switchTab(firstTab, tabs[tabIdx]);
+            return;
+        }
 
         const btn = document.getElementById('btnSalvar');
         btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">refresh</span>';
@@ -863,6 +988,19 @@
             document.getElementById('modalFarmName').innerText = currentProp.nome;
             document.getElementById('farmLoc').innerText = `${currentProp.municipio.toUpperCase()} / ${currentProp.uf}`;
 
+            // Atualizar botão toggle da propriedade
+            const toggleBtn = document.getElementById('btnToggleProp');
+            const toggleLabel = document.getElementById('btnTogglePropLabel');
+            if (currentProp.is_active) {
+                toggleLabel.innerText = 'Inativar';
+                toggleBtn.querySelector('.material-symbols-outlined').innerText = 'visibility_off';
+                toggleBtn.className = 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-400/20 px-5 py-3 text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-colors rounded-lg';
+            } else {
+                toggleLabel.innerText = 'Reativar';
+                toggleBtn.querySelector('.material-symbols-outlined').innerText = 'visibility';
+                toggleBtn.className = 'bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 px-5 py-3 text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-colors rounded-lg';
+            }
+
             const areaFmt = parseFloat(currentProp.area_total).toLocaleString('pt-BR');
             document.getElementById('farmArea').innerText = `${areaFmt} HA`;
             document.getElementById('farmAreaBottom').innerHTML = `${areaFmt}<span class="text-xl text-gray-500 ml-1">HA</span>`;
@@ -906,6 +1044,9 @@
                 ? `<span class="text-xs">${t.irrigacao_display}</span>`
                 : `<span class="text-gray-600 italic text-xs">—</span>`;
 
+            const toggleIcon = t.is_active ? 'visibility_off' : 'visibility';
+            const toggleColor = t.is_active ? 'hover:text-error' : 'hover:text-primary';
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>
@@ -924,11 +1065,11 @@
                 <td>${irrigHtml}</td>
                 <td>${statusHtml}</td>
                 <td class="text-right">
-                    <button onclick="editarTalhao(${t.id})" class="text-gray-400 hover:text-white mx-1 transition-colors">
+                    <button onclick="editarTalhao(${t.id})" class="text-gray-400 hover:text-white mx-1 transition-colors" title="Editar">
                         <span class="material-symbols-outlined text-[1rem]">edit</span>
                     </button>
-                    <button onclick="inativarTalhao(${t.id})" class="text-gray-400 hover:text-error mx-1 transition-colors">
-                        <span class="material-symbols-outlined text-[1rem]">visibility_off</span>
+                    <button onclick="toggleTalhaoStatus(${t.id}, ${t.is_active})" class="text-gray-400 ${toggleColor} mx-1 transition-colors" title="${t.is_active ? 'Inativar' : 'Reativar'}">
+                        <span class="material-symbols-outlined text-[1rem]">${toggleIcon}</span>
                     </button>
                 </td>
             `;
@@ -936,57 +1077,182 @@
         });
     }
 
+    // ─── Editar Propriedade (Modal) ──────────────────────────────────────
     function openEditPropriedadeModal() {
-        alert('A edição da propriedade ainda será implementada.');
+        if (!currentProp) return;
+        document.getElementById('ep_nome').value = currentProp.nome;
+        document.getElementById('ep_area').value = currentProp.area_total;
+        document.getElementById('ep_municipio').value = currentProp.municipio;
+        document.getElementById('ep_uf').value = currentProp.uf;
+        document.getElementById('ep_lat').value = currentProp.latitude || '';
+        document.getElementById('ep_long').value = currentProp.longitude || '';
+
+        const m = document.getElementById('modalEditPropDetail');
+        m.classList.remove('hidden');
+        setTimeout(() => {
+            m.classList.remove('opacity-0');
+            document.getElementById('editPropDialogDetail').classList.remove('scale-95');
+        }, 10);
     }
 
-    function editarTalhao(id) {
-        alert(`A edição do talhão ${id} ainda será implementada.`);
+    function closeEditPropModal() {
+        const m = document.getElementById('modalEditPropDetail');
+        m.classList.add('opacity-0');
+        document.getElementById('editPropDialogDetail').classList.add('scale-95');
+        setTimeout(() => m.classList.add('hidden'), 300);
     }
 
-    async function excluirPropriedade() {
-        if (!confirm('Deseja inativar esta propriedade?')) return;
+    async function submitEditProp(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnEditPropSave');
+        btn.disabled = true; btn.innerHTML = 'Salvando...';
+
+        const data = {
+            nome: document.getElementById('ep_nome').value,
+            area_total: parseFloat(document.getElementById('ep_area').value),
+            municipio: document.getElementById('ep_municipio').value,
+            uf: document.getElementById('ep_uf').value,
+        };
+        const lat = document.getElementById('ep_lat').value;
+        const lon = document.getElementById('ep_long').value;
+        if (lat) data.latitude = parseFloat(lat);
+        if (lon) data.longitude = parseFloat(lon);
 
         try {
             const resp = await fetch(`/api/propriedades/${PROP_ID}/`, {
-                method: 'DELETE',
-                headers: { 'X-CSRFToken': csrfToken }
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify(data)
             });
-
             if (resp.ok) {
-                showToast('Propriedade inativada com sucesso');
-                setTimeout(() => {
-                    window.location.href = "{% url 'web_properties:list' %}";
-                }, 800);
+                closeEditPropModal();
+                await loadData();
+                showToast('Propriedade atualizada');
             } else {
                 const erro = await resp.json();
-                alert('Erro ao excluir propriedade: ' + JSON.stringify(erro));
+                alert('Erro: ' + JSON.stringify(erro));
             }
-        } catch (err) {
-            alert('Erro de conexão com o servidor.');
-        }
+        } catch (err) { alert('Erro de conexão.'); }
+        btn.disabled = false; btn.innerHTML = 'Salvar';
     }
 
-    async function inativarTalhao(id) {
-        if (!confirm('Inativar este talhão? O histórico será preservado.')) return;
+    // ─── Toggle Status da Propriedade ────────────────────────────────────
+    async function togglePropriedadeStatus() {
+        const action = currentProp.is_active ? 'inativar' : 'reativar';
+        if (!confirm(`Deseja ${action} esta propriedade?`)) return;
+
+        try {
+            const resp = await fetch(`/api/propriedades/${PROP_ID}/toggle-status/`, {
+                method: 'PATCH',
+                headers: { 'X-CSRFToken': csrfToken }
+            });
+            if (resp.ok) {
+                await loadData();
+                showToast(`Propriedade ${action === 'inativar' ? 'inativada' : 'reativada'}`);
+            } else {
+                const erro = await resp.json();
+                alert('Erro: ' + JSON.stringify(erro));
+            }
+        } catch (err) { alert('Erro de conexão.'); }
+    }
+
+    // ─── Editar Talhão (Modal) ────────────────────────────────────────────
+    async function editarTalhao(id) {
+        try {
+            const resp = await fetch(`/api/propriedades/talhoes/${id}/`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!resp.ok) { alert('Talhão não encontrado.'); return; }
+            const t = await resp.json();
+
+            document.getElementById('et_id').value = t.id;
+            document.getElementById('et_nome').value = t.nome;
+            document.getElementById('et_codigo').value = t.codigo || '';
+            document.getElementById('et_area').value = t.area;
+            document.getElementById('et_area_produtiva').value = t.area_produtiva || '';
+            document.getElementById('et_solo').value = t.tipo_solo;
+            document.getElementById('et_cultura').value = t.cultura || '';
+            document.getElementById('et_safra').value = t.safra || '';
+            document.getElementById('et_ph').value = t.ph_solo || '';
+
+            const m = document.getElementById('modalEditTalhao');
+            m.classList.remove('hidden');
+            setTimeout(() => {
+                m.classList.remove('opacity-0');
+                document.getElementById('editTalhaoDialog').classList.remove('scale-95');
+            }, 10);
+        } catch (err) { alert('Erro ao carregar talhão.'); }
+    }
+
+    function closeEditTalhaoModal() {
+        const m = document.getElementById('modalEditTalhao');
+        m.classList.add('opacity-0');
+        document.getElementById('editTalhaoDialog').classList.add('scale-95');
+        setTimeout(() => m.classList.add('hidden'), 300);
+    }
+
+    async function submitEditTalhao(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnEditTalhaoSave');
+        btn.disabled = true; btn.innerHTML = 'Salvando...';
+
+        const id = document.getElementById('et_id').value;
+        const data = {
+            nome: document.getElementById('et_nome').value,
+            codigo: document.getElementById('et_codigo').value,
+            area: document.getElementById('et_area').value,
+            tipo_solo: document.getElementById('et_solo').value,
+        };
+        const ap = document.getElementById('et_area_produtiva').value;
+        const cult = document.getElementById('et_cultura').value;
+        const safra = document.getElementById('et_safra').value;
+        const ph = document.getElementById('et_ph').value;
+        if (ap) data.area_produtiva = ap;
+        if (cult) data.cultura = cult;
+        if (safra) data.safra = safra;
+        if (ph) data.ph_solo = ph;
 
         try {
             const resp = await fetch(`/api/propriedades/talhoes/${id}/`, {
-                method: 'DELETE',
-                headers: { 'X-CSRFToken': csrfToken }
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify(data)
             });
-
             if (resp.ok) {
+                closeEditTalhaoModal();
                 await loadData();
-                showToast('Talhão inativado');
+                showToast('Talhão atualizado');
             } else {
                 const erro = await resp.json();
-                alert('Erro ao inativar talhão: ' + JSON.stringify(erro));
+                alert('Erro: ' + JSON.stringify(erro));
             }
-        } catch (err) {
-            alert('Erro ao inativar talhão.');
-        }
+        } catch (err) { alert('Erro de conexão.'); }
+        btn.disabled = false; btn.innerHTML = 'Salvar';
     }
+
+    // ─── Toggle Status do Talhão ─────────────────────────────────────────
+    async function toggleTalhaoStatus(id, isActive) {
+        const action = isActive ? 'inativar' : 'reativar';
+        if (!confirm(`Deseja ${action} este talhão? O histórico será preservado.`)) return;
+
+        try {
+            const resp = await fetch(`/api/propriedades/talhoes/${id}/toggle-status/`, {
+                method: 'PATCH',
+                headers: { 'X-CSRFToken': csrfToken }
+            });
+            if (resp.ok) {
+                await loadData();
+                showToast(`Talhão ${action === 'inativar' ? 'inativado' : 'reativado'}`);
+            } else {
+                const erro = await resp.json();
+                alert('Erro: ' + JSON.stringify(erro));
+            }
+        } catch (err) { alert('Erro de conexão.'); }
+    }
+
+
+
+
 
     function showToast(msg) {
         const t = document.createElement('div');

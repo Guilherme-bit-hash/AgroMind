@@ -355,6 +355,13 @@
         input::placeholder {
                 color: #353534 !important;
             }
+
+        /* Fix: opções de <select> visíveis no tema escuro (Windows renderiza dropdown nativo) */
+        select option,
+        select optgroup {
+            background-color: #1c1b1b !important;
+            color: #e5e2e1 !important;
+        }
     </style>
 
     {% block extra_css %}{% endblock %}

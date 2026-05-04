@@ -31,6 +31,13 @@ def deactivate_propriedade(*, propriedade: Propriedade) -> Propriedade:
     return propriedade
 
 
+def toggle_propriedade_status(*, propriedade: Propriedade) -> Propriedade:
+    """Alterna o campo is_active entre True e False."""
+    propriedade.is_active = not propriedade.is_active
+    propriedade.save(update_fields=["is_active", "updated_at"])
+    return propriedade
+
+
 # ── Talhão ────────────────────────────────────────────────────────────────────
 
 def create_talhao(
@@ -96,5 +103,12 @@ def update_talhao(*, talhao: Talhao, **fields) -> Talhao:
 
 def deactivate_talhao(*, talhao: Talhao) -> Talhao:
     talhao.is_active = False
+    talhao.save(update_fields=["is_active", "updated_at"])
+    return talhao
+
+
+def toggle_talhao_status(*, talhao: Talhao) -> Talhao:
+    """Alterna o campo is_active entre True e False."""
+    talhao.is_active = not talhao.is_active
     talhao.save(update_fields=["is_active", "updated_at"])
     return talhao

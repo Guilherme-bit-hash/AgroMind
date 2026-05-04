@@ -106,13 +106,23 @@
     <!-- Template de Card de Propriedade (Oculto, usado via Vanilla JS) -->
     <template id="propertyCardTemplate">
         <div class="bg-surface-container-low border-l-4 border-l-primary border border-white/5 rounded-r-xl p-6 relative flex flex-col justify-between group hover:-translate-y-1 transition-transform">
-            <!-- Ponto "Ativo" + Menu -->
+            <!-- Ponto "Ativo" + Kebab Menu -->
             <div class="flex justify-between items-start mb-4">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 prop-status-badge">
                     <div class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_#54e98a]"></div>
-                    <span class="text-[10px] uppercase font-black text-primary tracking-wider">Sistema Ativo</span>
+                    <span class="text-[10px] uppercase font-black text-primary tracking-wider">Ativo</span>
                 </div>
-                <button class="text-gray-500 hover:text-white"><span class="material-symbols-outlined">more_vert</span></button>
+                <div class="relative">
+                    <button class="text-gray-500 hover:text-white kebab-btn" onclick="toggleKebab(event, this)"><span class="material-symbols-outlined">more_vert</span></button>
+                    <div class="kebab-menu hidden absolute right-0 top-8 bg-surface-container-high border border-white/10 rounded-lg shadow-lg z-20 min-w-[160px] py-1">
+                        <button class="kebab-edit w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-300 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-colors">
+                            <span class="material-symbols-outlined text-sm">edit</span> Editar
+                        </button>
+                        <a href="#" class="kebab-link block px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-300 hover:text-primary hover:bg-white/5 flex items-center gap-2 transition-colors">
+                            <span class="material-symbols-outlined text-sm">visibility</span> Ver Talhões
+                        </a>
+                    </div>
+                </div>
             </div>
             
             <h3 class="font-headline font-bold text-2xl text-white mb-6 prop-name">Nome da Fazenda</h3>
@@ -138,13 +148,13 @@
                     <span class="material-symbols-outlined text-sm">visibility</span>
                     <span class="text-xs font-bold uppercase tracking-wider">Ver Talhões</span>
                 </a>
-                <button class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+                <button class="prop-edit-btn flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-sm">edit</span>
                     <span class="text-xs font-bold uppercase tracking-wider">Editar</span>
                 </button>
             </div>
             
-            <!-- BG Watermark ou imagem (opcional) -->
+            <!-- BG Watermark -->
             <div class="absolute bottom-0 right-0 w-32 h-32 opacity-5 pointer-events-none overflow-hidden rounded-br-xl">
                 <span class="material-symbols-outlined text-[150px] translate-y-10 translate-x-10">landscape</span>
             </div>
@@ -241,6 +251,71 @@
     </div>
 </div>
 
+<!-- Modal Editar Propriedade -->
+<div id="modalEditProp" class="fixed inset-0 z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeEditModal()"></div>
+    
+    <div class="glass-modal w-full max-w-2xl relative rounded-2xl p-8 mx-4 transform scale-95 transition-transform duration-300" id="editModalDialog">
+        <h2 class="font-headline font-bold text-3xl text-white mb-2">Editar Propriedade</h2>
+        <p class="text-sm text-gray-400 mb-8">Atualize os dados da sua fazenda.</p>
+
+        <form id="editPropForm" onsubmit="submitEditForm(event)">
+            <input type="hidden" id="e_id" value="">
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Nome da Fazenda</label>
+                    <input type="text" id="e_nome" required class="custom-input text-white w-full" placeholder="Ex: Fazenda Santa Maria">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Área Total (HA)</label>
+                        <input type="number" step="0.01" id="e_area" required class="custom-input text-white w-full" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Município</label>
+                        <input type="text" id="e_cidade" required class="custom-input text-white w-full" placeholder="Cidade">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">UF (Estado)</label>
+                    <select id="e_uf" required class="custom-input text-white w-full appearance-none">
+                        <option value="" disabled>Selecione o estado</option>
+                        <option value="AC">Acre</option><option value="AL">Alagoas</option><option value="AP">Amapá</option>
+                        <option value="AM">Amazonas</option><option value="BA">Bahia</option><option value="CE">Ceará</option>
+                        <option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option><option value="GO">Goiás</option>
+                        <option value="MA">Maranhão</option><option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option>
+                        <option value="MG">Minas Gerais</option><option value="PA">Pará</option><option value="PB">Paraíba</option>
+                        <option value="PR">Paraná</option><option value="PE">Pernambuco</option><option value="PI">Piauí</option>
+                        <option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option><option value="RS">Rio Grande do Sul</option>
+                        <option value="RO">Rondônia</option><option value="RR">Roraima</option><option value="SC">Santa Catarina</option>
+                        <option value="SP">São Paulo</option><option value="SE">Sergipe</option><option value="TO">Tocantins</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Latitude</label>
+                        <input type="number" step="0.000001" id="e_lat" required class="custom-input text-white w-full" placeholder="-15.7942">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Longitude</label>
+                        <input type="number" step="0.000001" id="e_long" required class="custom-input text-white w-full" placeholder="-47.8822">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-6 pt-10">
+                <button type="button" onclick="closeEditModal()" class="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors">Cancelar</button>
+                <button type="submit" id="btnEditSalvar" class="bg-primary hover:bg-primary-fixed-dim text-on-primary text-sm font-bold uppercase tracking-wider py-3 px-8 rounded-lg shadow-[0_0_15px_rgba(84,233,138,0.3)] transition-all flex items-center justify-center gap-2">
+                    Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -309,10 +384,10 @@
         }
     }
 
-    // Pega as properties do JSON e constroi o Grid HMTL
+    // Pega as properties do JSON e constroi o Grid HTML
     function renderizarGrid(props) {
         const grid = document.getElementById('propertiesGrid');
-        grid.innerHTML = ""; // Limpa os loaders
+        grid.innerHTML = "";
         
         const cardTemplate = document.getElementById('propertyCardTemplate');
         
@@ -324,18 +399,102 @@
             clone.querySelector('.prop-area').textContent = parseFloat(p.area_total).toLocaleString('pt-BR') + ' HA';
             clone.querySelector('.prop-talhoes').textContent = p.talhoes.length + ' UNIDADES';
             
-            // Configura o link de ver talhões!
+            // Links de ver talhões
             clone.querySelector('.prop-link').href = `/propriedades/${p.id}/`;
+            clone.querySelector('.kebab-link').href = `/propriedades/${p.id}/`;
+            
+            // Botão editar no card
+            clone.querySelector('.prop-edit-btn').addEventListener('click', () => openEditModal(p));
+            clone.querySelector('.kebab-edit').addEventListener('click', () => openEditModal(p));
             
             grid.appendChild(clone);
         });
 
-        // E por último, insere o botão fixo de "+ Área"
         const addTemplate = document.getElementById('addButtonTemplate');
         grid.appendChild(addTemplate.content.cloneNode(true));
     }
 
-    // Submit form de Propriedade
+    // Kebab menu toggle
+    function toggleKebab(e, btn) {
+        e.stopPropagation();
+        const menu = btn.nextElementSibling;
+        document.querySelectorAll('.kebab-menu').forEach(m => { if(m !== menu) m.classList.add('hidden'); });
+        menu.classList.toggle('hidden');
+    }
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.kebab-menu').forEach(m => m.classList.add('hidden'));
+    });
+
+    // Modal Editar Propriedade
+    const editModal = document.getElementById('modalEditProp');
+    const editDialog = document.getElementById('editModalDialog');
+    const editForm = document.getElementById('editPropForm');
+
+    function openEditModal(prop) {
+        document.querySelectorAll('.kebab-menu').forEach(m => m.classList.add('hidden'));
+        document.getElementById('e_id').value = prop.id;
+        document.getElementById('e_nome').value = prop.nome;
+        document.getElementById('e_area').value = prop.area_total;
+        document.getElementById('e_cidade').value = prop.municipio;
+        document.getElementById('e_uf').value = prop.uf;
+        document.getElementById('e_lat').value = prop.latitude;
+        document.getElementById('e_long').value = prop.longitude;
+
+        editModal.classList.remove('hidden');
+        setTimeout(() => {
+            editModal.classList.remove('opacity-0');
+            editDialog.classList.remove('scale-95');
+        }, 10);
+    }
+
+    function closeEditModal() {
+        editModal.classList.add('opacity-0');
+        editDialog.classList.add('scale-95');
+        setTimeout(() => {
+            editModal.classList.add('hidden');
+            editForm.reset();
+        }, 300);
+    }
+
+    async function submitEditForm(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnEditSalvar');
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Salvando...';
+        btn.disabled = true;
+
+        const id = document.getElementById('e_id').value;
+        const data = {
+            nome: document.getElementById('e_nome').value,
+            area_total: parseFloat(document.getElementById('e_area').value),
+            municipio: document.getElementById('e_cidade').value,
+            uf: document.getElementById('e_uf').value,
+            latitude: parseFloat(document.getElementById('e_lat').value),
+            longitude: parseFloat(document.getElementById('e_long').value),
+        };
+
+        try {
+            const resp = await fetch(`/api/propriedades/${id}/`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify(data)
+            });
+
+            if (resp.ok) {
+                closeEditModal();
+                carregarPropriedades();
+            } else {
+                const erro = await resp.json();
+                alert('Erro ao salvar: ' + JSON.stringify(erro));
+            }
+        } catch (err) {
+            alert('Falha de conexão com a API.');
+        } finally {
+            btn.innerHTML = 'Salvar Alterações';
+            btn.disabled = false;
+        }
+    }
+
+    // Submit form de Nova Propriedade
     async function submitForm(e) {
         e.preventDefault();
         const btnSalvar = document.getElementById('btnSalvar');
@@ -354,32 +513,20 @@
         try {
             const resp = await fetch("/api/propriedades/", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": csrfToken
-                },
+                headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
                 body: JSON.stringify(data)
             });
 
             if(resp.ok) {
-                // Sucesso
                 closeModal();
-                btnSalvar.innerHTML = `Salvar Propriedade`;
-                btnSalvar.disabled = false;
-                
-                // Recarrega full grid pra mostrar o que acabou de criar
                 carregarPropriedades();
             } else {
                 const erro = await resp.json();
-                console.error("Erro Validation:", erro);
                 alert("Verifique os campos. Erro: " + JSON.stringify(erro));
-                btnSalvar.innerHTML = `Salvar Propriedade`;
-                btnSalvar.disabled = false;
             }
-
         } catch (err) {
-            console.error("Fetch error:", err);
             alert("Falha de conexão com a API.");
+        } finally {
             btnSalvar.innerHTML = `Salvar Propriedade`;
             btnSalvar.disabled = false;
         }

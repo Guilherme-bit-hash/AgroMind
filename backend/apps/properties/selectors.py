@@ -31,3 +31,18 @@ def get_talhao_by_id(*, talhao_id: int, user) -> Talhao:
         propriedade__is_active=True,
         is_active=True,
     )
+
+
+def get_all_propriedades_by_user(*, user) -> QuerySet[Propriedade]:
+    """Retorna todas as propriedades (ativas e inativas) do usuário."""
+    return Propriedade.objects.filter(owner=user)
+
+
+def get_propriedade_by_id_any_status(*, propriedade_id: int, user) -> Propriedade:
+    """Busca propriedade do owner ignorando is_active (toggle/reativar)."""
+    return Propriedade.objects.get(id=propriedade_id, owner=user)
+
+
+def get_talhao_by_id_any_status(*, talhao_id: int, user) -> Talhao:
+    """Busca talhão do owner ignorando is_active (toggle/reativar)."""
+    return Talhao.objects.get(id=talhao_id, propriedade__owner=user)

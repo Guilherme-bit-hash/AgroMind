@@ -23,7 +23,7 @@ class PropriedadeListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request: Request) -> Response:
-        propriedades = selectors.get_propriedades_by_user(user=request.user)
+        propriedades = selectors.get_all_propriedades_by_user(user=request.user)
         serializer = PropriedadeSerializer(propriedades, many=True)
         return Response(serializer.data)
 
@@ -49,7 +49,7 @@ class PropriedadeDetailView(APIView):
 
     def _get_propriedade_or_404(self, propriedade_id: int, user):
         try:
-            return selectors.get_propriedade_by_id(propriedade_id=propriedade_id, user=user)
+            return selectors.get_propriedade_by_id_any_status(propriedade_id=propriedade_id, user=user)
         except Exception:
             return None
 
@@ -85,6 +85,21 @@ class PropriedadeDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class PropriedadeToggleStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request: Request, propriedade_id: int) -> Response:
+        try:
+            propriedade = selectors.get_propriedade_by_id_any_status(
+                propriedade_id=propriedade_id, user=request.user
+            )
+        except Exception:
+            return Response({"detail": "Propriedade não encontrada."}, status=status.HTTP_404_NOT_FOUND)
+
+        services.toggle_propriedade_status(propriedade=propriedade)
+        return Response(PropriedadeSerializer(propriedade).data)
+
+
 # ── Talhões ───────────────────────────────────────────────────────────────────
 
 class TalhaoListCreateView(APIView):
@@ -101,7 +116,7 @@ class TalhaoListCreateView(APIView):
         if not propriedade:
             return Response({"detail": "Propriedade não encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
-        talhoes = selectors.get_talhoes_by_propriedade(propriedade=propriedade)
+        talhoes = selectors.get_talhoes_by_propriedade(propriedade=propriedade, apenas_ativos=False)
         return Response(TalhaoSerializer(talhoes, many=True).data)
 
     def post(self, request: Request, propriedade_id: int) -> Response:
@@ -125,7 +140,7 @@ class TalhaoDetailView(APIView):
 
     def _get_talhao_or_404(self, talhao_id: int, user):
         try:
-            return selectors.get_talhao_by_id(talhao_id=talhao_id, user=user)
+            return selectors.get_talhao_by_id_any_status(talhao_id=talhao_id, user=user)
         except Exception:
             return None
 
@@ -157,3 +172,18 @@ class TalhaoDetailView(APIView):
 
         services.deactivate_talhao(talhao=talhao)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TalhaoToggleStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request: Request, talhao_id: int) -> Response:
+        try:
+            talhao = selectors.get_talhao_by_id_any_status(
+                talhao_id=talhao_id, user=request.user
+            )
+        except Exception:
+            return Response({"detail": "Talhão não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+        services.toggle_talhao_status(talhao=talhao)
+        return Response(TalhaoSerializer(talhao).data)

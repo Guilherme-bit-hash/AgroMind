@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html class="dark" lang="pt-br">
 
@@ -6,6 +7,9 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta name="description" content="AgroMind Rural — Inteligência agrícola de precisão para o agronegócio moderno." />
     <title>{% block title %}AgroMind Rural{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'img/Logo_Minimalista.png' %}">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>

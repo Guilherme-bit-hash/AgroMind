@@ -14,6 +14,7 @@ urlpatterns = [
     path("usuarios/", include("apps.users.urls", namespace="users")),
     path("propriedades/", include("apps.properties.web_urls", namespace="web_properties")),
     path("estoque/", include("apps.estoque.web_urls", namespace="web_estoque")),
+    path("plantio/", include("apps.planting.web_urls", namespace="web_planting")),
 
     path("api/propriedades/", include("apps.properties.urls", namespace="properties")),
 

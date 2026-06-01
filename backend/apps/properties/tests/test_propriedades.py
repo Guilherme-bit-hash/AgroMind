@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from rest_framework.test import APIClient
 
-from apps.properties.models import Propriedade, Talhao
+from apps.properties.models import Propriedade, Talhao, Cultura
 from apps.properties import services, selectors
 
 User = get_user_model()
@@ -262,3 +262,76 @@ def test_api_sem_autenticacao_retorna_401():
     client = APIClient()
     response = client.get("/api/propriedades/")
     assert response.status_code == 401
+
+
+# ── Testes: Cultura por Nome (SlugRelatedField) ───────────────────────────────
+
+@pytest.fixture
+def culturas(db):
+    soja = Cultura.objects.create(
+        nome="Soja",
+        temp_min_ideal=20.0,
+        temp_max_ideal=35.0,
+        chuva_max_diaria=50.0,
+        temp_critica_geada=2.0
+    )
+    milho = Cultura.objects.create(
+        nome="Milho",
+        temp_min_ideal=18.0,
+        temp_max_ideal=30.0,
+        chuva_max_diaria=40.0,
+        temp_critica_geada=1.0
+    )
+    return {"Soja": soja, "Milho": milho}
+
+
+@pytest.mark.django_db
+def test_api_cria_talhao_com_cultura_sucesso(client_auth, propriedade, culturas):
+    payload = {
+        "nome": "Talhão de Soja",
+        "area": "60.00",
+        "tipo_solo": "argiloso",
+        "cultura": "Soja",
+    }
+    response = client_auth.post(
+        f"/api/propriedades/{propriedade.pk}/talhoes/", payload, format="json"
+    )
+    assert response.status_code == 201
+    assert response.data["cultura"] == "Soja"
+    
+    # Verificar no banco
+    talhao_db = Talhao.objects.get(pk=response.data["id"])
+    assert talhao_db.cultura == culturas["Soja"]
+
+
+@pytest.mark.django_db
+def test_api_atualiza_talhao_com_cultura_sucesso(client_auth, propriedade, talhao, culturas):
+    payload = {
+        "cultura": "Milho",
+    }
+    response = client_auth.patch(
+        f"/api/propriedades/talhoes/{talhao.pk}/", payload, format="json"
+    )
+    assert response.status_code == 200
+    assert response.data["cultura"] == "Milho"
+    
+    # Verificar no banco
+    talhao.refresh_from_db()
+    assert talhao.cultura == culturas["Milho"]
+
+
+@pytest.mark.django_db
+def test_api_cria_talhao_com_cultura_inexistente_erro(client_auth, propriedade):
+    payload = {
+        "nome": "Talhão de Soja",
+        "area": "60.00",
+        "tipo_solo": "argiloso",
+        "cultura": "ABCXYZ",
+    }
+    response = client_auth.post(
+        f"/api/propriedades/{propriedade.pk}/talhoes/", payload, format="json"
+    )
+    assert response.status_code == 400
+    assert "cultura" in response.data
+    assert response.data["cultura"][0] == "Objeto com nome 'ABCXYZ' não encontrado."
+

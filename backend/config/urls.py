@@ -15,8 +15,10 @@ urlpatterns = [
     path("propriedades/", include("apps.properties.web_urls", namespace="web_properties")),
     path("estoque/", include("apps.estoque.web_urls", namespace="web_estoque")),
     path("plantio/", include("apps.planting.web_urls", namespace="web_planting")),
+    path("clima/", include("apps.weather.web_urls", namespace="web_weather")),
 
     path("api/propriedades/", include("apps.properties.urls", namespace="properties")),
+    path("api/weather/", include("apps.weather.urls", namespace="weather")),
 
     # Sprint 03 — Estoque de Insumos
     path("api/v1/propriedades/<int:propriedade_id>/insumos/", include("apps.estoque.urls", namespace="estoque")),

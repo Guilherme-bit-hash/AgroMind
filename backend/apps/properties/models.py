@@ -43,17 +43,19 @@ class TipoSolo(models.TextChoices):
     MISTO    = "misto",    "Misto"
 
 
-class Cultura(models.TextChoices):
-    SOJA     = "soja",     "Soja"
-    MILHO    = "milho",    "Milho"
-    CANA     = "cana",     "Cana-de-açúcar"
-    CAFE     = "cafe",     "Café"
-    ALGODAO  = "algodao",  "Algodão"
-    FEIJAO   = "feijao",   "Feijão"
-    TRIGO    = "trigo",    "Trigo"
-    SORGO    = "sorgo",    "Sorgo"
-    PASTAGEM = "pastagem", "Pastagem"
-    OUTRO    = "outro",    "Outro"
+class Cultura(models.Model):
+    nome = models.CharField(max_length=50, unique=True, verbose_name="Nome da cultura")
+    temp_min_ideal = models.FloatField(verbose_name="Temperatura Mínima Ideal")
+    temp_max_ideal = models.FloatField(verbose_name="Temperatura Máxima Ideal")
+    chuva_max_diaria = models.FloatField(verbose_name="Chuva Máxima Diária (mm)")
+    temp_critica_geada = models.FloatField(default=4.0, verbose_name="Temperatura Crítica de Geada")
+
+    class Meta:
+        verbose_name = "Cultura"
+        verbose_name_plural = "Culturas"
+
+    def __str__(self):
+        return self.nome
 
 
 class SistemaCultivo(models.TextChoices):
@@ -105,7 +107,7 @@ class Talhao(models.Model):
     ph_solo       = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True, verbose_name="pH (CaCl₂)")
 
     # Cultura e manejo
-    cultura         = models.CharField(max_length=30, choices=Cultura.choices, blank=True, verbose_name="Cultura principal")
+    cultura         = models.ForeignKey(Cultura, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Cultura principal")
     safra           = models.CharField(max_length=10, blank=True, default="2026/2027", verbose_name="Safra")
     sistema_cultivo = models.CharField(max_length=20, choices=SistemaCultivo.choices, default=SistemaCultivo.DIRETO, verbose_name="Sistema de cultivo")
     irrigacao       = models.CharField(max_length=20, choices=Irrigacao.choices, default=Irrigacao.SEQUEIRO, verbose_name="Irrigação")

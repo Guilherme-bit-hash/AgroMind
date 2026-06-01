@@ -5,9 +5,13 @@ from .models import Propriedade, Talhao, UF, TipoSolo, Cultura, SistemaCultivo, 
 
 class TalhaoSerializer(serializers.ModelSerializer):
     tipo_solo_display = serializers.CharField(source="get_tipo_solo_display", read_only=True)
-    cultura_display = serializers.CharField(source="get_cultura_display", read_only=True)
+    cultura = serializers.SlugRelatedField(slug_field="nome", read_only=True)
+    cultura_display = serializers.SerializerMethodField()
     sistema_cultivo_display = serializers.CharField(source="get_sistema_cultivo_display", read_only=True)
     irrigacao_display = serializers.CharField(source="get_irrigacao_display", read_only=True)
+
+    def get_cultura_display(self, obj):
+        return obj.cultura.nome if obj.cultura else None
 
     class Meta:
         model = Talhao
@@ -33,7 +37,13 @@ class TalhaoCreateSerializer(serializers.Serializer):
     declividade = serializers.DecimalField(max_digits=5, decimal_places=1, required=False, allow_null=True)
     tipo_solo = serializers.ChoiceField(choices=TipoSolo.choices)
     ph_solo = serializers.DecimalField(max_digits=4, decimal_places=1, required=False, allow_null=True)
-    cultura = serializers.ChoiceField(choices=Cultura.choices, required=False, allow_blank=True)
+    cultura = serializers.SlugRelatedField(
+        queryset=Cultura.objects.all(),
+        slug_field="nome",
+        required=False,
+        allow_null=True,
+        error_messages={"does_not_exist": "Objeto com nome '{value}' não encontrado."}
+    )
     safra = serializers.CharField(max_length=10, required=False, allow_blank=True)
     sistema_cultivo = serializers.ChoiceField(choices=SistemaCultivo.choices, required=False)
     irrigacao = serializers.ChoiceField(choices=Irrigacao.choices, required=False)
@@ -51,7 +61,13 @@ class TalhaoUpdateSerializer(serializers.Serializer):
     declividade = serializers.DecimalField(max_digits=5, decimal_places=1, required=False, allow_null=True)
     tipo_solo = serializers.ChoiceField(choices=TipoSolo.choices, required=False)
     ph_solo = serializers.DecimalField(max_digits=4, decimal_places=1, required=False, allow_null=True)
-    cultura = serializers.ChoiceField(choices=Cultura.choices, required=False, allow_blank=True)
+    cultura = serializers.SlugRelatedField(
+        queryset=Cultura.objects.all(),
+        slug_field="nome",
+        required=False,
+        allow_null=True,
+        error_messages={"does_not_exist": "Objeto com nome '{value}' não encontrado."}
+    )
     safra = serializers.CharField(max_length=10, required=False, allow_blank=True)
     sistema_cultivo = serializers.ChoiceField(choices=SistemaCultivo.choices, required=False)
     irrigacao = serializers.ChoiceField(choices=Irrigacao.choices, required=False)

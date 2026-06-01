@@ -51,14 +51,16 @@
                     <input type="number" step="0.01" name="area_hectares" id="id_area_hectares" required class="w-full bg-transparent border-b border-outline-variant py-2 text-white font-body text-sm focus:border-primary focus:outline-none transition-colors" placeholder="Ex: 100">
                 </div>
 
-                <!-- Nível Tecnológico -->
+                <!-- Custo por Hectare -->
                 <div class="group">
-                    <label class="block text-[10px] font-label uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Nível Tecnológico</label>
-                    <select name="nivel_tecnologico" id="id_nivel_tecnologico" required class="w-full bg-transparent border-b border-outline-variant py-2 text-white font-body text-sm focus:border-primary focus:outline-none transition-colors appearance-none">
-                        <option value="baixo">Baixo</option>
-                        <option value="medio" selected>Médio</option>
-                        <option value="alto">Alto</option>
-                    </select>
+                    <label class="block text-[10px] font-label uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Custo por Hectare (R$/ha)</label>
+                    <input type="number" step="0.01" name="custo_por_hectare" id="id_custo_por_hectare" required class="w-full bg-transparent border-b border-outline-variant py-2 text-white font-body text-sm focus:border-primary focus:outline-none transition-colors" placeholder="Ex: 3500.00">
+                </div>
+
+                <!-- Produtividade Esperada -->
+                <div class="group">
+                    <label class="block text-[10px] font-label uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Produtividade Esperada (sc/ha)</label>
+                    <input type="number" step="0.01" name="produtividade_esperada" id="id_produtividade_esperada" required class="w-full bg-transparent border-b border-outline-variant py-2 text-white font-body text-sm focus:border-primary focus:outline-none transition-colors" placeholder="Ex: 60">
                 </div>
 
                 <!-- Preço da Saca -->
@@ -69,10 +71,6 @@
             </div>
 
             <!-- Campos ocultos para enviar o resultado pro backend -->
-            <input type="hidden" name="custo_sementes" id="h_sementes">
-            <input type="hidden" name="custo_fertilizantes" id="h_fertilizantes">
-            <input type="hidden" name="custo_defensivos" id="h_defensivos">
-            <input type="hidden" name="produtividade_esperada" id="h_produtividade">
             <input type="hidden" name="custo_total_estimado" id="h_custo_total">
             <input type="hidden" name="receita_projetada" id="h_receita">
             <input type="hidden" name="margem_lucro" id="h_margem">
@@ -95,9 +93,7 @@
                 <span class="block text-[10px] font-label text-on-surface-variant uppercase tracking-widest mb-1">Custo Total Estimado</span>
                 <span class="block text-3xl font-headline font-bold text-error" id="ui_custo_total">R$ 0,00</span>
                 <div class="mt-4 pt-4 border-t border-white/5 text-xs text-on-surface-variant">
-                    <div class="flex justify-between mb-1"><span>Sementes:</span> <span id="ui_sementes">R$ 0,00</span></div>
-                    <div class="flex justify-between mb-1"><span>Fertilizantes:</span> <span id="ui_fertilizantes">R$ 0,00</span></div>
-                    <div class="flex justify-between"><span>Defensivos:</span> <span id="ui_defensivos">R$ 0,00</span></div>
+                    <div class="flex justify-between"><span>Custo por Hectare:</span> <span id="ui_custo_por_hectare">R$ 0,00</span></div>
                 </div>
             </div>
 
@@ -138,75 +134,30 @@
 
 {% block extra_js %}
 <script>
-    // Valores mockados (Fictícios) para cálculos (Custo por HA e Produtividade base por HA)
-    // Estrutura: cultura: { nivel: { sementes, fertilizantes, defensivos, produtividade } }
-    const constants = {
-        'soja': {
-            'baixo': { sementes: 200, fertilizantes: 800, defensivos: 500, produtividade: 45 },
-            'medio': { sementes: 350, fertilizantes: 1200, defensivos: 800, produtividade: 60 },
-            'alto':  { sementes: 600, fertilizantes: 1800, defensivos: 1200, produtividade: 80 }
-        },
-        'milho': {
-            'baixo': { sementes: 150, fertilizantes: 900, defensivos: 400, produtividade: 80 },
-            'medio': { sementes: 300, fertilizantes: 1400, defensivos: 700, produtividade: 120 },
-            'alto':  { sementes: 550, fertilizantes: 2100, defensivos: 1100, produtividade: 180 }
-        },
-        'cafe': {
-            'baixo': { sementes: 0, fertilizantes: 1200, defensivos: 800, produtividade: 20 },
-            'medio': { sementes: 0, fertilizantes: 2000, defensivos: 1500, produtividade: 35 },
-            'alto':  { sementes: 0, fertilizantes: 3500, defensivos: 2500, produtividade: 55 }
-        },
-        'algodao': {
-            'baixo': { sementes: 400, fertilizantes: 1500, defensivos: 1800, produtividade: 150 },
-            'medio': { sementes: 700, fertilizantes: 2500, defensivos: 3000, produtividade: 250 },
-            'alto':  { sementes: 1200, fertilizantes: 4000, defensivos: 5000, produtividade: 320 }
-        }
-    };
-
-    // Fatores fixos que não dependem da cultura para simplificar
-    const CUSTO_MAO_OBRA_HA = 300;
-    const CUSTO_COMBUSTIVEL_HA = 250;
-    const CUSTO_MANUTENCAO_HA = 150;
-
     const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
     const formatNumber = (val) => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(val);
 
     function calcular() {
-        const cultura = document.getElementById('id_cultura').value;
         const area = parseFloat(document.getElementById('id_area_hectares').value) || 0;
-        const nivel = document.getElementById('id_nivel_tecnologico').value;
+        const custoPorHectare = parseFloat(document.getElementById('id_custo_por_hectare').value) || 0;
+        const produtividadeEsperada = parseFloat(document.getElementById('id_produtividade_esperada').value) || 0;
         const preco = parseFloat(document.getElementById('id_preco_saca_esperado').value) || 0;
 
-        if (!cultura || area <= 0 || !preco || !constants[cultura]) return;
+        if (area <= 0 || custoPorHectare <= 0 || produtividadeEsperada <= 0 || preco <= 0) return;
 
-        const base = constants[cultura][nivel];
-        
-        // RF-11: Estimar insumos baseados na área
-        const sementes = base.sementes * area;
-        const fertilizantes = base.fertilizantes * area;
-        const defensivos = base.defensivos * area;
-        const outros = (CUSTO_MAO_OBRA_HA + CUSTO_COMBUSTIVEL_HA + CUSTO_MANUTENCAO_HA) * area;
-
-        // RF-13: Custo Total
-        const custoTotal = sementes + fertilizantes + defensivos + outros;
-
-        // RF-12: Produtividade e Receita
-        const produtividade = base.produtividade;
-        const totalSacas = produtividade * area;
+        // Novas Regras de Negócio
+        const custoTotal = area * custoPorHectare;
+        const totalSacas = area * produtividadeEsperada;
         const receita = totalSacas * preco;
-
-        // Margem de Lucro e Ponto Equilíbrio (RF-14)
         const lucro = receita - custoTotal;
         const margem = receita > 0 ? (lucro / receita) * 100 : 0;
         const pontoEquilibrio = preco > 0 ? custoTotal / preco : 0;
 
         // Atualizar UI
-        document.getElementById('ui_sementes').innerText = formatCurrency(sementes);
-        document.getElementById('ui_fertilizantes').innerText = formatCurrency(fertilizantes);
-        document.getElementById('ui_defensivos').innerText = formatCurrency(defensivos);
+        document.getElementById('ui_custo_por_hectare').innerText = formatCurrency(custoPorHectare);
         document.getElementById('ui_custo_total').innerText = formatCurrency(custoTotal);
         
-        document.getElementById('ui_produtividade').innerText = `${produtividade} sc/ha`;
+        document.getElementById('ui_produtividade').innerText = `${produtividadeEsperada} sc/ha`;
         document.getElementById('ui_total_sacas').innerText = `${formatNumber(totalSacas)} sc`;
         document.getElementById('ui_receita').innerText = formatCurrency(receita);
         
@@ -221,14 +172,10 @@
         if (margem > 0) {
             alertText.innerText = `Safra viável! Você precisará colher ${formatNumber(pontoEquilibrio)} sacas no total (aprox. ${formatNumber(pontoEquilibrio/area)} sc/ha) apenas para pagar os custos. O que passar disso é lucro.`;
         } else {
-            alertText.innerText = `ALERTA: A safra apresenta prejuízo estimado. O custo de produção está maior que a receita projetada. Considere rever os custos ou o nível tecnológico.`;
+            alertText.innerText = `ALERTA: A safra apresenta prejuízo estimado. O custo de produção está maior que a receita projetada. Considere rever os custos ou a produtividade esperada.`;
         }
 
         // Atualizar hidden inputs
-        document.getElementById('h_sementes').value = sementes.toFixed(2);
-        document.getElementById('h_fertilizantes').value = fertilizantes.toFixed(2);
-        document.getElementById('h_defensivos').value = defensivos.toFixed(2);
-        document.getElementById('h_produtividade').value = produtividade.toFixed(2);
         document.getElementById('h_custo_total').value = custoTotal.toFixed(2);
         document.getElementById('h_receita').value = receita.toFixed(2);
         document.getElementById('h_margem').value = margem.toFixed(2);
@@ -236,9 +183,12 @@
     }
 
     // Listeners
-    ['id_cultura', 'id_area_hectares', 'id_nivel_tecnologico', 'id_preco_saca_esperado'].forEach(id => {
-        document.getElementById(id).addEventListener('input', calcular);
-        document.getElementById(id).addEventListener('change', calcular);
+    ['id_area_hectares', 'id_custo_por_hectare', 'id_produtividade_esperada', 'id_preco_saca_esperado'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', calcular);
+            el.addEventListener('change', calcular);
+        }
     });
 </script>
 {% endblock %}

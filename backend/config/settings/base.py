@@ -44,6 +44,7 @@ SITE_ID = 1
 THIRD_PARTY_APPS: list[str] = [
     "rest_framework",
     "rest_framework_simplejwt",
+    "corsheaders",
 ]
 
 LOCAL_APPS = [
@@ -51,6 +52,7 @@ LOCAL_APPS = [
     "apps.properties",
     "apps.planting",
     "apps.estoque",
+    "apps.weather",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -59,6 +61,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # Middleware
 # ---------------------------------------------------------------------------
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -204,3 +207,8 @@ SIMPLE_JWT = {
 LOGIN_URL = "/usuarios/login/"
 LOGIN_REDIRECT_URL = "/usuarios/dashboard/"
 LOGOUT_REDIRECT_URL = "/usuarios/login/"
+
+# ---------------------------------------------------------------------------
+# CORS
+# ---------------------------------------------------------------------------
+CORS_ALLOW_ALL_ORIGINS = True # Apenas para desenvolvimento local

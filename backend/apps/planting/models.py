@@ -63,11 +63,6 @@ class Safra(models.Model):
         return f"{self.nome} — {self.propriedade.nome}"
 
 
-class NivelTecnologico(models.TextChoices):
-    BAIXO = "baixo", "Baixo"
-    MEDIO = "medio", "Médio"
-    ALTO = "alto", "Alto"
-
 class SimulacaoSafra(models.Model):
     """
     Model para salvar simulações de plantio (RF-09 a RF-15).
@@ -88,23 +83,17 @@ class SimulacaoSafra(models.Model):
     area_hectares = models.DecimalField(
         max_digits=10, decimal_places=2, verbose_name="Área (ha)"
     )
-    nivel_tecnologico = models.CharField(
-        max_length=10,
-        choices=NivelTecnologico.choices,
-        verbose_name="Nível Tecnológico"
+    custo_por_hectare = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Custo por Hectare (R$/ha)", default=0
+    )
+    produtividade_esperada = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Produtividade Esperada (sc/ha)", default=0
     )
     preco_saca_esperado = models.DecimalField(
         max_digits=10, decimal_places=2, verbose_name="Preço da Saca (R$)"
     )
 
     # Resultados calculados da simulação
-    custo_sementes = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    custo_fertilizantes = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    custo_defensivos = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    
-    produtividade_esperada = models.DecimalField(
-        max_digits=10, decimal_places=2, verbose_name="Produtividade Esperada (sc/ha)", default=0
-    )
     custo_total_estimado = models.DecimalField(
         max_digits=15, decimal_places=2, verbose_name="Custo Total Estimado (R$)", default=0
     )
@@ -128,3 +117,29 @@ class SimulacaoSafra(models.Model):
 
     def __str__(self):
         return f"Simulação: {self.nome} ({self.get_cultura_display()})"
+
+    def save(self, *args, **kwargs):
+        # Novas Regras de Negócio
+        # Custo Total
+        self.custo_total_estimado = self.area_hectares * self.custo_por_hectare
+
+        # Produção Total
+        producao_total = self.area_hectares * self.produtividade_esperada
+
+        # Receita Projetada
+        self.receita_projetada = producao_total * self.preco_saca_esperado
+
+        # Margem de Lucro
+        if self.receita_projetada > 0:
+            lucro = self.receita_projetada - self.custo_total_estimado
+            self.margem_lucro = round((lucro / self.receita_projetada) * 100, 2)
+        else:
+            self.margem_lucro = 0
+
+        # Ponto de Equilíbrio
+        if self.preco_saca_esperado > 0:
+            self.ponto_equilibrio = round(self.custo_total_estimado / self.preco_saca_esperado, 2)
+        else:
+            self.ponto_equilibrio = 0
+
+        super().save(*args, **kwargs)

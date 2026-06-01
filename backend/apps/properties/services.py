@@ -1,7 +1,8 @@
 # apps/properties/services.py
 from decimal import Decimal
 from django.core.exceptions import ValidationError
-from .models import Propriedade, Talhao
+from django.utils import timezone
+from .models import Propriedade, Talhao, Cultura
 
 
 # ── Propriedade ───────────────────────────────────────────────────────────────
@@ -50,7 +51,7 @@ def create_talhao(
     area_produtiva: Decimal | None = None,
     declividade: Decimal | None = None,
     ph_solo: Decimal | None = None,
-    cultura: str = "",
+    cultura: Cultura | None = None,
     safra: str = "2026/2027",
     sistema_cultivo: str = "direto",
     irrigacao: str = "sequeiro",

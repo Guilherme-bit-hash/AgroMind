@@ -1,37 +1,41 @@
-# config/settings/base.py
-# Configurações compartilhadas por TODOS os ambientes.
-# Nunca execute com este settings diretamente — use development.py ou production.py.
+# Configurações compartilhadas por TODOS os ambientes
+# Nunca execute diretamente — use development.py ou production.py
 
 import environ
 from pathlib import Path
+from datetime import timedelta
 
 # ---------------------------------------------------------------------------
 # Caminhos base
 # ---------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-# BASE_DIR aponta para AgroGestao/backend/
 
+# ---------------------------------------------------------------------------
+# ENV
+# ---------------------------------------------------------------------------
 env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
 )
 
-# Carrega o arquivo .env a partir da raiz do backend
+# Tenta carregar .env (local). No Render isso é ignorado automaticamente.
 environ.Env.read_env(BASE_DIR / ".env")
 
 # ---------------------------------------------------------------------------
 # Segurança
 # ---------------------------------------------------------------------------
+SECRET_KEY = env("DJANGO_SECRET_KEY", default="dev-secret-key")
+DEBUG = env.bool("DEBUG", default=True)
 
-SECRET_KEY = env("DJANGO_SECRET_KEY")
-DEBUG = env("DEBUG")
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[
-    "agromind-1-xva0.onrender.com",
-    "localhost",
-    "127.0.0.1",
-])
+ALLOWED_HOSTS = env.list(
+    "ALLOWED_HOSTS",
+    default=[
+        "localhost",
+        "127.0.0.1",
+        "agromind-1-xva0.onrender.com",
+    ],
+)
 
-# 🔐 CSRF (CORREÇÃO DO SEU ERRO NO RENDER)
 CSRF_TRUSTED_ORIGINS = env.list(
     "CSRF_TRUSTED_ORIGINS",
     default=[
@@ -39,16 +43,13 @@ CSRF_TRUSTED_ORIGINS = env.list(
     ],
 )
 
-# ---------------------------------------------------------------------------
-# Segurança adicional (recomendado para Render)
-# ---------------------------------------------------------------------------
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = False  # True só em produção HTTPS real
+CSRF_COOKIE_SECURE = False     # True só em produção HTTPS real
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
 # ---------------------------------------------------------------------------
-# Aplicações instaladas
+# Apps
 # ---------------------------------------------------------------------------
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -62,7 +63,7 @@ DJANGO_APPS = [
 
 SITE_ID = 1
 
-THIRD_PARTY_APPS: list[str] = [
+THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
@@ -97,6 +98,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
+# ---------------------------------------------------------------------------
+# Templates
+# ---------------------------------------------------------------------------
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -116,24 +120,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 # ---------------------------------------------------------------------------
-# RF-05 | Segurança de senhas — BCrypt como hasher principal
-# ---------------------------------------------------------------------------
-PASSWORD_HASHERS = [
-    # Posição 0 = hasher PADRÃO para novas senhas
-    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
-
-    # Hashers legados abaixo: usados APENAS para verificar senhas antigas
-    # (usuários migrados de outro sistema). Django faz upgrade automático
-    # para BCrypt no próximo login do usuário.
-    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
-    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
-]
-# Por que BCryptSHA256 e não BCrypt puro?
-# O BCrypt tem limite de 72 bytes na entrada. O SHA256PasswordHasher faz um
-# pré-hash da senha antes de passar ao BCrypt, eliminando esse limite.
-
-# ---------------------------------------------------------------------------
-# Banco de Dados — MySQL
+# Banco de dados (SQLite local padrão)
 # ---------------------------------------------------------------------------
 DATABASES = {
     "default": {
@@ -143,28 +130,26 @@ DATABASES = {
 }
 
 # ---------------------------------------------------------------------------
-# RF-02 | Sessões e Segurança de Autenticação
+# Usuário customizado
 # ---------------------------------------------------------------------------
 AUTH_USER_MODEL = "users.CustomUser"
 
+# ---------------------------------------------------------------------------
+# Sessões
+# ---------------------------------------------------------------------------
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
-# Sessões armazenadas no banco — permite invalidação server-side.
 
 SESSION_COOKIE_AGE = env.int("SESSION_COOKIE_AGE", default=28800)
-# Padrão: 8 horas (28800 segundos). Configurável via .env.
-
 SESSION_EXPIRE_AT_BROWSER_CLOSE = env.bool(
-    "SESSION_EXPIRE_AT_BROWSER_CLOSE", default=False
+    "SESSION_EXPIRE_AT_BROWSER_CLOSE",
+    default=False
 )
 
 SESSION_COOKIE_HTTPONLY = True
-# Impede que JavaScript acesse o cookie de sessão — mitiga XSS.
-
 SESSION_COOKIE_SAMESITE = "Lax"
-# Proteção contra CSRF em requisições cross-site.
 
 # ---------------------------------------------------------------------------
-# Validação de senha (RF-05 — complementar ao bcrypt)
+# Senhas
 # ---------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -176,20 +161,24 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+]
+
 # ---------------------------------------------------------------------------
 # Internacionalização
 # ---------------------------------------------------------------------------
 LANGUAGE_CODE = "pt-br"
-TIME_ZONE     = "America/Sao_Paulo"
-USE_I18N      = True
-USE_TZ        = True
-# USE_TZ=True é OBRIGATÓRIO. Django armazena tudo em UTC internamente
-# e converte para TIME_ZONE na exibição — evita bugs de horário de verão.
+TIME_ZONE = "America/Sao_Paulo"
+USE_I18N = True
+USE_TZ = True
 
 # ---------------------------------------------------------------------------
-# Arquivos estáticos
+# Static files
 # ---------------------------------------------------------------------------
-STATIC_URL  = "/static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_DIRS = [
@@ -199,13 +188,17 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ---------------------------------------------------------------------------
-# RF-03 | E-mail (configurado por ambiente)
+# Email
 # ---------------------------------------------------------------------------
-DEFAULT_FROM_EMAIL     = env("DEFAULT_FROM_EMAIL", default="noreply@agrogestao.com.br")
-PASSWORD_RESET_TIMEOUT = 3600  # Link de reset expira em 1 hora
+DEFAULT_FROM_EMAIL = env(
+    "DEFAULT_FROM_EMAIL",
+    default="noreply@agrogestao.com.br"
+)
+
+PASSWORD_RESET_TIMEOUT = 3600
 
 # ---------------------------------------------------------------------------
-# Django REST Framework + SimpleJWT
+# DRF + JWT
 # ---------------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -217,17 +210,17 @@ REST_FRAMEWORK = {
     ),
 }
 
-from datetime import timedelta  # noqa: E402
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": False,
     "AUTH_HEADER_TYPES": ("Bearer",),
-    
-
 }
+
+# ---------------------------------------------------------------------------
+# Login
+# ---------------------------------------------------------------------------
 LOGIN_URL = "/usuarios/login/"
 LOGIN_REDIRECT_URL = "/usuarios/dashboard/"
 LOGOUT_REDIRECT_URL = "/usuarios/login/"
@@ -235,4 +228,4 @@ LOGOUT_REDIRECT_URL = "/usuarios/login/"
 # ---------------------------------------------------------------------------
 # CORS
 # ---------------------------------------------------------------------------
-CORS_ALLOW_ALL_ORIGINS = True # Apenas para desenvolvimento local
+CORS_ALLOW_ALL_ORIGINS = True

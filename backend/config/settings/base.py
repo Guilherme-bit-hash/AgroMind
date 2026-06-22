@@ -22,10 +22,31 @@ environ.Env.read_env(BASE_DIR / ".env")
 # ---------------------------------------------------------------------------
 # Segurança
 # ---------------------------------------------------------------------------
-SECRET_KEY    = env("DJANGO_SECRET_KEY")
-DEBUG         = env("DEBUG")
-ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
+SECRET_KEY = env("DJANGO_SECRET_KEY")
+DEBUG = env("DEBUG")
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[
+    "agromind-1-xva0.onrender.com",
+    "localhost",
+    "127.0.0.1",
+])
+
+# 🔐 CSRF (CORREÇÃO DO SEU ERRO NO RENDER)
+CSRF_TRUSTED_ORIGINS = env.list(
+    "CSRF_TRUSTED_ORIGINS",
+    default=[
+        "https://agromind-1-xva0.onrender.com",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Segurança adicional (recomendado para Render)
+# ---------------------------------------------------------------------------
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 # ---------------------------------------------------------------------------
 # Aplicações instaladas
 # ---------------------------------------------------------------------------

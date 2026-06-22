@@ -1,0 +1,554 @@
+{% extends "base.html" %}
+
+{% block title %}Clima — AgroMind Rural{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Weather card hover */
+    .weather-card {
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    }
+    .weather-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Classification glow borders */
+    .classification-verde { border-color: #22c55e; }
+    .classification-amarelo { border-color: #eab308; }
+    .classification-vermelho { border-color: #ef4444; }
+
+    /* Pulse dot */
+    @keyframes dotPulse {
+        0%, 100% { opacity: 0.4; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.3); }
+    }
+    .dot-pulse { animation: dotPulse 2s ease-in-out infinite; }
+
+    /* Skeleton loader */
+    @keyframes skeletonShimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+    .skeleton {
+        background: linear-gradient(90deg, #1c1b1b 25%, #2a2a2a 50%, #1c1b1b 75%);
+        background-size: 200% 100%;
+        animation: skeletonShimmer 1.5s ease-in-out infinite;
+        border-radius: 0.5rem;
+    }
+
+    /* Badge pill */
+    .badge-verde { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.25); }
+    .badge-amarelo { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.25); }
+    .badge-vermelho { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); }
+
+    /* Alert icon color */
+    .alert-icon-verde { color: #4ade80; }
+    .alert-icon-amarelo { color: #facc15; }
+    .alert-icon-vermelho { color: #f87171; }
+
+    /* Summary ring */
+    .summary-ring {
+        width: 120px;
+        height: 120px;
+    }
+
+    /* Custom select override for dark theme */
+    #plotSelect {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 0.75rem;
+        padding: 0.875rem 1rem !important;
+        cursor: pointer;
+    }
+    #plotSelect:focus {
+        border-color: #54e98a !important;
+        box-shadow: 0 0 0 2px rgba(84, 233, 138, 0.15) !important;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Sidebar -->
+<aside class="h-screen w-72 fixed left-0 top-0 z-50 bg-[#131313] shadow-[0_24px_48px_rgba(0,0,0,0.4)] flex flex-col py-8 px-6">
+    <div class="mb-12">
+        <h1 class="text-2xl font-black tracking-tighter text-primary font-headline">AgroMind</h1>
+        <p class="font-headline font-bold tracking-tight uppercase text-xs text-gray-500">Rural Intelligence</p>
+    </div>
+
+    <nav class="flex-1 space-y-1" id="sidebar-nav">
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="{% url 'users:dashboard' %}">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="{% url 'web_properties:list' %}">
+            <span class="material-symbols-outlined">landscape</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Propriedades</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="{% url 'web_planting:simulacao_list' %}">
+            <span class="material-symbols-outlined">model_training</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Simulação</span>
+        </a>
+        <!-- ATIVO: Clima -->
+        <a class="flex items-center gap-4 py-3 px-4 text-primary border-l-4 border-primary-container bg-gradient-to-r from-primary-container/10 to-transparent transition-all duration-300 group" href="{% url 'web_weather:dashboard' %}">
+            <span class="material-symbols-outlined">wb_sunny</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Clima</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="#">
+            <span class="material-symbols-outlined">agriculture</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Operacional</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="#">
+            <span class="material-symbols-outlined">payments</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Financeiro</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="{% url 'web_estoque:select' %}">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Estoque</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="#">
+            <span class="material-symbols-outlined">group</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Colaboradores</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="#">
+            <span class="material-symbols-outlined">trending_up</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Commodities</span>
+        </a>
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="#">
+            <span class="material-symbols-outlined">history</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Histórico</span>
+        </a>
+        {% if user.is_admin %}
+        <a class="flex items-center gap-4 py-3 px-4 text-gray-500 hover:text-white hover:translate-x-2 transition-all duration-300 group" href="{% url 'users:user_list' %}">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-headline font-bold tracking-tight uppercase text-xs">Usuários</span>
+        </a>
+        {% endif %}
+    </nav>
+
+    <div class="mt-auto pt-8 border-t border-white/5">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full overflow-hidden bg-primary-container flex items-center justify-center">
+                <span class="material-symbols-outlined text-on-primary-container text-xl">person</span>
+            </div>
+            <div class="flex-grow">
+                <p class="text-xs font-bold text-white uppercase tracking-wider truncate">{{ user.name }}</p>
+                <p class="text-[10px] text-primary uppercase tracking-widest font-bold">{{ user.get_role_display }}</p>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- Top Nav Bar -->
+<header class="fixed top-0 right-0 w-[calc(100%-18rem)] z-40 bg-[#131313]/80 backdrop-blur-xl flex justify-between items-center px-10 h-20 border-b border-white/5">
+    <div class="flex items-center gap-4">
+        <h2 class="font-headline font-bold text-xl tracking-tighter text-white">AgroMind Rural</h2>
+    </div>
+    <div class="flex items-center gap-6">
+        <form method="post" action="{% url 'users:logout' %}" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="flex items-center gap-2 text-gray-400 hover:text-error transition-colors duration-200 text-sm font-label">
+                <span class="material-symbols-outlined text-lg">logout</span>
+                <span class="uppercase tracking-wider text-[10px] font-bold">Sair</span>
+            </button>
+        </form>
+    </div>
+</header>
+
+<!-- Main Page Content -->
+<main class="ml-72 min-h-screen pt-28 px-10 pb-20 max-w-[1600px] relative">
+
+    <!-- Page Header -->
+    <div class="flex justify-between items-end mb-10 animate-fade-in-up">
+        <div>
+            <div class="flex items-center gap-3 mb-2">
+                <span class="material-symbols-outlined text-primary text-xl">wb_sunny</span>
+                <span class="text-[10px] font-headline font-bold uppercase text-primary tracking-widest">Monitoramento Climático</span>
+            </div>
+            <h1 class="text-3xl font-headline font-bold text-white">Previsão do Tempo</h1>
+            <p class="text-on-surface-variant text-sm mt-1">Consulte a janela de plantio dos seus talhões com base em dados climáticos dos próximos 10 dias.</p>
+        </div>
+    </div>
+
+    <!-- Plot Selector -->
+    <div class="animate-fade-in-up delay-100 mb-8">
+        <div class="bg-surface-container-low border border-white/5 rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="material-symbols-outlined text-secondary text-lg">pin_drop</span>
+                <span class="text-[10px] font-headline font-bold uppercase text-secondary tracking-widest">Selecione um Talhão</span>
+            </div>
+            <select id="plotSelect" class="w-full max-w-lg text-white font-body text-sm">
+                <option value="" disabled selected>Carregando talhões...</option>
+            </select>
+            <p class="text-[10px] text-on-surface-variant mt-2 flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">info</span>
+                Apenas talhões com coordenadas e cultura cadastrada podem ser consultados.
+            </p>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="hidden animate-fade-in-up">
+        <div class="bg-surface-container-low border border-white/5 rounded-2xl p-8 mb-6">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="skeleton w-10 h-10 rounded-full"></div>
+                <div class="flex-1">
+                    <div class="skeleton h-5 w-48 mb-2"></div>
+                    <div class="skeleton h-3 w-32"></div>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="skeleton h-20 rounded-xl"></div>
+                <div class="skeleton h-20 rounded-xl"></div>
+                <div class="skeleton h-20 rounded-xl"></div>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="skeleton h-48 rounded-xl"></div>
+            <div class="skeleton h-48 rounded-xl"></div>
+            <div class="skeleton h-48 rounded-xl"></div>
+            <div class="skeleton h-48 rounded-xl"></div>
+            <div class="skeleton h-48 rounded-xl"></div>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="hidden animate-fade-in-up">
+        <div class="bg-surface-container-low border border-error/20 rounded-2xl p-8 flex items-center gap-6">
+            <div class="w-14 h-14 rounded-full bg-error/10 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-error text-2xl">error</span>
+            </div>
+            <div>
+                <h3 class="font-headline font-bold text-lg text-white mb-1">Erro ao consultar previsão</h3>
+                <p class="text-on-surface-variant text-sm" id="errorMessage">Ocorreu um erro inesperado.</p>
+            </div>
+            <button onclick="retryFetch()" class="ml-auto bg-error/10 text-error hover:bg-error/20 transition-colors px-4 py-2 rounded-xl text-xs font-headline font-bold uppercase tracking-wider flex items-center gap-2 flex-shrink-0">
+                <span class="material-symbols-outlined text-sm">refresh</span> Tentar Novamente
+            </button>
+        </div>
+    </div>
+
+    <!-- Empty State (before selection) -->
+    <div id="emptyState" class="animate-fade-in-up delay-200">
+        <div class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-20 h-20 bg-surface-container-high rounded-full flex items-center justify-center mb-6">
+                <span class="material-symbols-outlined text-on-surface-variant text-4xl">cloud</span>
+            </div>
+            <h2 class="text-xl font-headline font-bold text-white mb-2">Nenhum talhão selecionado</h2>
+            <p class="text-on-surface-variant max-w-sm">Selecione um talhão acima para visualizar a previsão climática e a janela de plantio dos próximos 10 dias.</p>
+        </div>
+    </div>
+
+    <!-- Results Container -->
+    <div id="resultsContainer" class="hidden">
+
+        <!-- Talhão Summary Header -->
+        <div class="bg-surface-container-low border border-white/5 rounded-2xl p-6 mb-6 animate-fade-in-up" id="plotSummary">
+            <div class="flex items-start justify-between">
+                <div class="flex items-center gap-5">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-2xl">grass</span>
+                    </div>
+                    <div>
+                        <h2 class="font-headline font-bold text-xl text-white" id="plotName">—</h2>
+                        <div class="flex items-center gap-4 mt-1">
+                            <span class="text-xs text-on-surface-variant flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">eco</span>
+                                <span id="plotCultura">—</span>
+                            </span>
+                            <span class="text-xs text-on-surface-variant flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">location_on</span>
+                                <span id="plotCoords">—</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Classification General Badge -->
+                <div class="text-right" id="generalBadge">
+                    <span class="text-[10px] font-headline font-bold uppercase tracking-widest text-on-surface-variant block mb-1">Classificação Geral</span>
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-headline font-bold uppercase tracking-wider" id="generalBadgePill">—</span>
+                </div>
+            </div>
+
+            <!-- Summary Counters -->
+            <div class="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/5">
+                <div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-3 h-3 rounded-full bg-green-500 dot-pulse"></div>
+                    <div>
+                        <span class="block text-[9px] font-headline font-bold uppercase tracking-widest text-gray-500">Dias Favoráveis</span>
+                        <span class="block font-headline font-black text-xl text-green-400" id="countVerde">0</span>
+                    </div>
+                </div>
+                <div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-3 h-3 rounded-full bg-yellow-500 dot-pulse" style="animation-delay: 0.5s;"></div>
+                    <div>
+                        <span class="block text-[9px] font-headline font-bold uppercase tracking-widest text-gray-500">Dias Atenção</span>
+                        <span class="block font-headline font-black text-xl text-yellow-400" id="countAmarelo">0</span>
+                    </div>
+                </div>
+                <div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-3 h-3 rounded-full bg-red-500 dot-pulse" style="animation-delay: 1s;"></div>
+                    <div>
+                        <span class="block text-[9px] font-headline font-bold uppercase tracking-widest text-gray-500">Dias Críticos</span>
+                        <span class="block font-headline font-black text-xl text-red-400" id="countVermelho">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10-Day Forecast Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="forecastGrid">
+            <!-- Cards injected via JS -->
+        </div>
+    </div>
+
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ─── Helpers ───
+    function getCookie(name) {
+        let v = null;
+        if (document.cookie && document.cookie !== '') {
+            document.cookie.split(';').forEach(c => {
+                c = c.trim();
+                if (c.startsWith(name + '=')) v = decodeURIComponent(c.substring(name.length + 1));
+            });
+        }
+        return v;
+    }
+
+    const WEEKDAYS_PT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    const MONTHS_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+    function formatDateBR(dateStr) {
+        const d = new Date(dateStr + 'T00:00:00');
+        return {
+            weekday: WEEKDAYS_PT[d.getDay()],
+            day: d.getDate(),
+            month: MONTHS_PT[d.getMonth()],
+            full: d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0')
+        };
+    }
+
+    // ─── State ───
+    let allPlots = [];
+    let currentPlot = null;
+
+    // ─── DOM refs ───
+    const plotSelect = document.getElementById('plotSelect');
+    const loadingState = document.getElementById('loadingState');
+    const errorState = document.getElementById('errorState');
+    const emptyState = document.getElementById('emptyState');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const forecastGrid = document.getElementById('forecastGrid');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // ─── Show/Hide helpers ───
+    function showOnly(el) {
+        [loadingState, errorState, emptyState, resultsContainer].forEach(e => e.classList.add('hidden'));
+        if (el) el.classList.remove('hidden');
+    }
+
+    // ─── 1. Load all plots from all properties ───
+    async function loadPlots() {
+        try {
+            const resp = await fetch('/api/propriedades/', { headers: { 'Accept': 'application/json' } });
+            if (!resp.ok) throw new Error();
+            const propriedades = await resp.json();
+
+            allPlots = [];
+            propriedades.forEach(prop => {
+                if (prop.talhoes && prop.talhoes.length > 0) {
+                    prop.talhoes.forEach(t => {
+                        allPlots.push({
+                            id: t.id,
+                            nome: t.nome,
+                            propriedade: prop.nome,
+                            latitude: t.latitude,
+                            longitude: t.longitude,
+                            cultura: t.cultura_nome || t.cultura,
+                            area: t.area
+                        });
+                    });
+                }
+            });
+
+            renderPlotSelect();
+        } catch (err) {
+            plotSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar talhões</option>';
+        }
+    }
+
+    function renderPlotSelect() {
+        plotSelect.innerHTML = '<option value="" disabled selected>— Selecione um talhão —</option>';
+
+        if (allPlots.length === 0) {
+            plotSelect.innerHTML = '<option value="" disabled selected>Nenhum talhão cadastrado</option>';
+            return;
+        }
+
+        // Group by property
+        const groups = {};
+        allPlots.forEach(p => {
+            if (!groups[p.propriedade]) groups[p.propriedade] = [];
+            groups[p.propriedade].push(p);
+        });
+
+        Object.keys(groups).forEach(propName => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = propName;
+            groups[propName].forEach(plot => {
+                const opt = document.createElement('option');
+                opt.value = plot.id;
+                const culturaLabel = plot.cultura ? ` • ${plot.cultura}` : '';
+                const coordLabel = (plot.latitude && plot.longitude) ? '' : ' ⚠ Sem coordenadas';
+                opt.textContent = `${plot.nome}${culturaLabel}${coordLabel}`;
+                if (!plot.latitude || !plot.longitude) opt.disabled = true;
+                optgroup.appendChild(opt);
+            });
+            plotSelect.appendChild(optgroup);
+        });
+    }
+
+    // ─── 2. Fetch Weather on Selection ───
+    plotSelect.addEventListener('change', function() {
+        const plotId = parseInt(this.value);
+        currentPlot = allPlots.find(p => p.id === plotId);
+        if (currentPlot) fetchWeather(plotId);
+    });
+
+    async function fetchWeather(plotId) {
+        showOnly(loadingState);
+
+        try {
+            const resp = await fetch(`/api/weather/plot/${plotId}/`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            });
+
+            if (!resp.ok) {
+                const errData = await resp.json().catch(() => ({}));
+                throw new Error(errData.detail || 'Erro ao obter a previsão do tempo.');
+            }
+
+            const data = await resp.json();
+            renderResults(data);
+        } catch (err) {
+            errorMessage.textContent = err.message;
+            showOnly(errorState);
+        }
+    }
+
+    function retryFetch() {
+        if (currentPlot) fetchWeather(currentPlot.id);
+    }
+
+    // ─── 3. Render Results ───
+    function renderResults(data) {
+        showOnly(resultsContainer);
+
+        // Plot summary
+        document.getElementById('plotName').textContent = data.talhao || currentPlot.nome;
+        document.getElementById('plotCultura').textContent = currentPlot.cultura || 'Cultura não informada';
+        document.getElementById('plotCoords').textContent = `${currentPlot.latitude}, ${currentPlot.longitude}`;
+
+        // Counters
+        const summary = data.summary;
+        document.getElementById('countVerde').textContent = summary.verde;
+        document.getElementById('countAmarelo').textContent = summary.amarelo;
+        document.getElementById('countVermelho').textContent = summary.vermelho;
+
+        // General badge
+        const pill = document.getElementById('generalBadgePill');
+        pill.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-headline font-bold uppercase tracking-wider';
+
+        if (summary.verde >= summary.amarelo && summary.verde >= summary.vermelho) {
+            pill.classList.add('badge-verde');
+            pill.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> Plantio Recomendado';
+        } else if (summary.vermelho > 0 && summary.vermelho >= summary.amarelo) {
+            pill.classList.add('badge-vermelho');
+            pill.innerHTML = '<span class="material-symbols-outlined text-sm">dangerous</span> Não Plantar';
+        } else {
+            pill.classList.add('badge-amarelo');
+            pill.innerHTML = '<span class="material-symbols-outlined text-sm">warning</span> Atenção';
+        }
+
+        // Forecast cards
+        forecastGrid.innerHTML = '';
+        data.forecast.forEach((day, i) => {
+            const dt = formatDateBR(day.date);
+            const cls = day.classification; // verde, amarelo, vermelho
+
+            const iconMap = {
+                verde: 'check_circle',
+                amarelo: 'warning',
+                vermelho: 'dangerous'
+            };
+            const labelMap = {
+                verde: 'Plantio OK',
+                amarelo: 'Atenção',
+                vermelho: 'Não Plantar'
+            };
+
+            const card = document.createElement('div');
+            card.className = `weather-card bg-surface-container-low border-t-4 classification-${cls} border border-white/5 rounded-xl p-5 flex flex-col animate-fade-in-up`;
+            card.style.animationDelay = `${i * 0.05}s`;
+
+            card.innerHTML = `
+                <!-- Date Header -->
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <span class="block text-[10px] font-headline font-bold uppercase tracking-widest text-gray-500">${dt.weekday}</span>
+                        <span class="block font-headline font-black text-2xl text-white">${dt.day}</span>
+                        <span class="block text-[10px] font-headline font-bold uppercase text-gray-500 tracking-wider">${dt.month}</span>
+                    </div>
+                    <span class="material-symbols-outlined text-2xl alert-icon-${cls}">${iconMap[cls]}</span>
+                </div>
+
+                <!-- Temps -->
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] uppercase font-black text-gray-500 tracking-wider">Máx</span>
+                        <span class="font-headline font-bold text-white">${day.temperature_max}°C</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] uppercase font-black text-gray-500 tracking-wider">Mín</span>
+                        <span class="font-headline font-bold text-secondary">${day.temperature_min}°C</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] uppercase font-black text-gray-500 tracking-wider">Chuva</span>
+                        <span class="font-headline font-bold text-tertiary">${day.precipitation} mm</span>
+                    </div>
+                </div>
+
+                <!-- Status Badge -->
+                <div class="mt-auto">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-headline font-bold uppercase tracking-wider badge-${cls}">
+                        <span class="material-symbols-outlined text-[10px]">${iconMap[cls]}</span>
+                        ${labelMap[cls]}
+                    </span>
+                </div>
+
+                ${day.alert ? `
+                <!-- Alert -->
+                <div class="mt-3 pt-3 border-t border-white/5 flex items-start gap-2">
+                    <span class="material-symbols-outlined text-xs alert-icon-${cls} mt-0.5">info</span>
+                    <span class="text-[10px] text-on-surface-variant leading-tight">${day.alert}</span>
+                </div>
+                ` : ''}
+            `;
+
+            forecastGrid.appendChild(card);
+        });
+    }
+
+    // ─── Init ───
+    document.addEventListener('DOMContentLoaded', () => {
+        loadPlots();
+    });
+</script>
+{% endblock %}

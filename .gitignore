@@ -1,0 +1,36 @@
+# Ambiente virtual
+venv/
+env/
+.venv/
+
+# Variáveis de ambiente — NUNCA versionar
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pycache
+
+# Django
+*.log
+*.pot
+*.pyc
+db.sqlite3
+staticfiles/
+mediafiles/
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+.mysql_data/

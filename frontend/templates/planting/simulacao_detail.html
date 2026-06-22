@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}{{ simulacao.nome }} — AgroMind Rural{% endblock %}
+
+{% block body %}
+{% include "includes/sidebar.html" %}
+
+<div class="ml-72 min-h-screen relative">
+<header class="bg-surface-container-low border-b border-white/5 pt-6 pb-6 px-10 flex justify-between items-end sticky top-0 z-40">
+    <div class="flex items-center gap-4">
+        <a href="{% url 'web_planting:simulacao_list' %}" class="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-white">arrow_back</span>
+        </a>
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="text-[10px] font-headline font-bold uppercase text-primary tracking-widest">{{ simulacao.get_cultura_display }}</span>
+            </div>
+            <h1 class="text-2xl font-headline font-bold text-white">{{ simulacao.nome }}</h1>
+        </div>
+    </div>
+    <div class="flex items-center gap-6">
+        <div class="text-right">
+            <span class="block text-[10px] font-label text-on-surface-variant uppercase tracking-widest">Área Simulada</span>
+            <span class="text-lg font-headline font-bold text-white">{{ simulacao.area_hectares }} ha</span>
+        </div>
+        <button type="button" onclick="document.getElementById('delete-modal').classList.remove('hidden')" class="bg-error/10 text-error hover:bg-error/20 transition-colors w-12 h-12 rounded-xl flex items-center justify-center group" title="Excluir Simulação">
+            <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">delete</span>
+        </button>
+    </div>
+</header>
+
+<main class="p-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <!-- Custo -->
+        <div class="bg-surface-container-low border border-white/5 rounded-2xl p-6">
+            <span class="block text-[10px] font-label text-on-surface-variant uppercase tracking-widest mb-1">Custo Estimado</span>
+            <span class="block text-3xl font-headline font-bold text-error mb-4">R$ {{ simulacao.custo_total_estimado|floatformat:"2g" }}</span>
+            <div class="space-y-2 text-xs text-on-surface-variant border-t border-white/5 pt-4">
+                <div class="flex justify-between"><span>Custo por Hectare:</span> <span>R$ {{ simulacao.custo_por_hectare|floatformat:"2g" }}</span></div>
+            </div>
+        </div>
+
+        <!-- Receita -->
+        <div class="bg-surface-container-low border border-white/5 rounded-2xl p-6">
+            <span class="block text-[10px] font-label text-on-surface-variant uppercase tracking-widest mb-1">Receita Projetada</span>
+            <span class="block text-3xl font-headline font-bold text-primary mb-4">R$ {{ simulacao.receita_projetada|floatformat:"2g" }}</span>
+            <div class="space-y-2 text-xs text-on-surface-variant border-t border-white/5 pt-4">
+                <div class="flex justify-between"><span>Preço Esperado (sc):</span> <span>R$ {{ simulacao.preco_saca_esperado|floatformat:"2g" }}</span></div>
+                <div class="flex justify-between"><span>Produtividade/ha:</span> <span>{{ simulacao.produtividade_esperada }} sc</span></div>
+            </div>
+        </div>
+
+        <!-- Margem e Ponto -->
+        <div class="bg-surface-container-low border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
+            <div>
+                <span class="block text-[10px] font-label text-on-surface-variant uppercase tracking-widest mb-1">Margem de Lucro</span>
+                <span class="block text-4xl font-headline font-bold {% if simulacao.margem_lucro > 0 %}text-primary{% else %}text-error{% endif %}">{{ simulacao.margem_lucro }}%</span>
+            </div>
+            <div class="border-t border-white/5 pt-4">
+                <span class="block text-[10px] font-label text-on-surface-variant uppercase tracking-widest mb-1">Ponto de Equilíbrio</span>
+                <span class="block text-lg font-headline font-bold text-secondary">{{ simulacao.ponto_equilibrio }} sacas</span>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Delete Modal -->
+<div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div class="bg-surface-container-high border border-white/10 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-error text-xl">warning</span>
+            </div>
+            <div>
+                <h3 class="text-xl font-headline font-bold text-white">Excluir Simulação</h3>
+                <p class="text-sm text-on-surface-variant mt-1">Ação irreversível.</p>
+            </div>
+        </div>
+        <p class="text-on-surface-variant mb-8">Tem certeza que deseja excluir a simulação <strong class="text-white">"{{ simulacao.nome }}"</strong>? Todos os dados financeiros e projeções serão perdidos.</p>
+        <div class="flex justify-end gap-3">
+            <button type="button" onclick="document.getElementById('delete-modal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl font-headline font-bold text-xs uppercase tracking-widest text-on-surface-variant hover:text-white hover:bg-white/5 transition-colors">
+                Cancelar
+            </button>
+            <form method="POST" action="{% url 'web_planting:simulacao_delete' simulacao.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="px-5 py-2.5 rounded-xl font-headline font-bold text-xs uppercase tracking-widest bg-[#EF4444] text-white hover:bg-[#EF4444]/80 transition-colors">
+                    Excluir
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</div>
+{% endblock %}

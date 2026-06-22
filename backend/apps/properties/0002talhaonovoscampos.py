@@ -1,0 +1,81 @@
+# apps/properties/migrations/0002_talhao_novos_campos.py
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ("properties", "0001_initial"),
+    ]
+
+    operations = [
+        migrations.AddField(
+            model_name="talhao",
+            name="codigo",
+            field=models.CharField(blank=True, max_length=40, verbose_name="Código interno"),
+        ),
+        migrations.AddField(
+            model_name="talhao",
+            name="area_produtiva",
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="Área produtiva (ha)"),
+        ),
+        migrations.AddField(
+            model_name="talhao",
+            name="declividade",
+            field=models.DecimalField(blank=True, decimal_places=1, max_digits=5, null=True, verbose_name="Declividade (%)"),
+        ),
+        migrations.AddField(
+            model_name="talhao",
+            name="ph_solo",
+            field=models.DecimalField(blank=True, decimal_places=1, max_digits=4, null=True, verbose_name="pH (CaCl₂)"),
+        ),
+        migrations.AddField(
+            model_name="talhao",
+            name="cultura",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("soja", "Soja"), ("milho", "Milho"), ("cana", "Cana-de-açúcar"),
+                    ("cafe", "Café"), ("algodao", "Algodão"), ("feijao", "Feijão"),
+                    ("trigo", "Trigo"), ("sorgo", "Sorgo"), ("pastagem", "Pastagem"), ("outro", "Outro"),
+                ],
+                max_length=30,
+                verbose_name="Cultura principal",
+            ),
+        ),
+        migrations.AddField(
+            model_name="talhao",
+            name="safra",
+            field=models.CharField(blank=True, default="2026/2027", max_length=10, verbose_name="Safra"),
+        ),
+        migrations.AddField(
+            model_name="talhao",
+            name="sistema_cultivo",
+            field=models.CharField(
+                choices=[("direto", "Plantio direto"), ("convencional", "Convencional"), ("minimo", "Cultivo mínimo")],
+                default="direto",
+                max_length=20,
+                verbose_name="Sistema de cultivo",
+            ),
+        ),
+        migrations.AddField(
+            model_name="talhao",
+            name="irrigacao",
+            field=models.CharField(
+                choices=[("sequeiro", "Sequeiro"), ("pivo", "Pivô central"), ("gotejamento", "Gotejamento"), ("aspersao", "Aspersão")],
+                default="sequeiro",
+                max_length=20,
+                verbose_name="Irrigação",
+            ),
+        ),
+        migrations.AddField(
+            model_name="talhao",
+            name="pragas_doencas",
+            field=models.TextField(blank=True, verbose_name="Pragas e doenças monitoradas"),
+        ),
+        migrations.AddField(
+            model_name="talhao",
+            name="observacoes",
+            field=models.TextField(blank=True, verbose_name="Observações"),
+        ),
+    ]

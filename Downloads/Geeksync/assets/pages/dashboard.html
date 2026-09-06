@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeekSync ERP | Dashboard</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+
+    <!-- Bootstrap Icons (opcional, para ícones) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+    <!-- ========================================================= -->
+    <!--                   DASHBOARD PAGE                          -->
+    <!-- ========================================================= -->
+    <div class="page active" id="page-dashboard">
+        <div class="container-fluid" style="padding: 32px 36px;">
+
+            <!-- Header -->
+            <div class="page-header">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p>Visão geral do sistema GeekSync ERP</p>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge badge-success">● Sistema Online</span>
+                </div>
+            </div>
+
+            <!-- Cards -->
+            <div class="dashboard-grid">
+
+                <div class="dashboard-card">
+                    <div class="card-header-dash">
+                        <div>
+                            <div class="card-label">Clientes</div>
+                            <div class="card-value" id="totalClientes">0</div>
+                        </div>
+                        <i class="bi bi-people card-icon blue"></i>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-header-dash">
+                        <div>
+                            <div class="card-label">Produtos</div>
+                            <div class="card-value" id="totalProdutos">0</div>
+                        </div>
+                        <i class="bi bi-box-seam card-icon blue"></i>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-header-dash">
+                        <div>
+                            <div class="card-label">Vendas</div>
+                            <div class="card-value" id="totalVendas">0</div>
+                        </div>
+                        <i class="bi bi-cart-check card-icon green"></i>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-header-dash">
+                        <div>
+                            <div class="card-label">Faturamento</div>
+                            <div class="card-value" id="totalFaturamento">R$ 0,00</div>
+                        </div>
+                        <i class="bi bi-currency-dollar card-icon yellow"></i>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Gráfico -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Vendas por Mês</h5>
+                    <span style="color:var(--muted); font-size:.85rem;">Ano corrente</span>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoVendas" style="height:300px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Últimas Atividades -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Últimas Atividades</h5>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <ul class="list-group" id="listaAtividades">
+                        <li class="list-group-item" style="justify-content:center; color:var(--muted);">
+                            Carregando atividades...
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!--                   SCRIPTS                                 -->
+    <!-- ========================================================= -->
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+
+</body>
+</html>

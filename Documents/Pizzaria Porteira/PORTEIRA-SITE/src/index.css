@@ -1,0 +1,88 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+/* Efeito hover */
+a:hover {
+  background-color: #6d4c3a !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 20px 60px rgba(217, 255, 79, 0.8) !important;
+}
+
+/* Efeito clique */
+a:active {
+  transform: translateY(2px) scale(0.98) !important;
+  box-shadow: 0 4px 20px rgba(217, 255, 79, 0.4) !important;
+}
+
+/* ANIMAÇÕES ESPECÍFICAS PARA A LOGO - Adicione no index.css */
+@keyframes logo-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes logo-glow {
+  0%, 100% {
+    box-shadow: 
+      0 20px 40px rgba(255, 238, 88, 0.6),
+      0 0 0 0 rgba(255, 215, 0, 0);
+  }
+  50% {
+    box-shadow: 
+      0 25px 50px rgba(255, 238, 88, 0.8),
+      0 0 0 10px rgba(255, 215, 0, 0.3);
+  }
+}
+
+@keyframes logo-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Classe para a borda giratória (pseudo-elemento) */
+.logo-border::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #FFD700;
+  border-right-color: #FFA500;
+  animation: logo-rotate 20s linear infinite;
+  z-index: -1;
+}
+
+/* Classe para partículas */
+.logo-particles {
+  position: relative;
+}
+
+.logo-particles::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 550px;
+  height: 550px;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 60%, rgba(255, 215, 0, 0.1) 100%);
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  animation: logo-float 4s ease-in-out infinite;
+}

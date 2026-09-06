@@ -1,0 +1,294 @@
+/* src/styles/cardapio.css */
+.cardapio-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2D1B00 0%, #3A240F 30%, #4A2F15 60%, #5A3E2B 100%);
+  background-attachment: fixed;
+  position: relative;
+  overflow-x: hidden;
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* BOTÃO VOLTAR */
+.btn-voltar {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(45, 27, 0, 0.9);
+  color: #FFD700;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.btn-voltar:hover {
+  background: rgba(58, 36, 15, 0.95);
+  transform: scale(1.05);
+}
+
+/* LOGO TOPO */
+.logo-topo {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  z-index: 1000;
+  width: 100px;
+  height: 100px;
+  animation: float 6s ease-in-out infinite;
+}
+
+.logo-topo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 10px solid rgba(255, 215, 0, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5),
+              0 0 40px rgba(255, 215, 0, 0.4),
+              inset 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+/* CABEÇALHO */
+.cardapio-header {
+  text-align: center;
+  padding: 6rem 1rem 2rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.cardapio-header h1 {
+  color: #FFD700;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  margin-bottom: 0.5rem;
+}
+
+.cardapio-header h2 {
+  color: #FFFFFF;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  text-shadow: 0 3px 10px rgba(0,0,0,0.9);
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+}
+
+.slogan {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 215, 0, 0.15);
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #FFD700;
+  font-weight: bold;
+}
+
+/* ABAS */
+.abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-bottom: 3rem;
+  padding: 0 1rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+}
+
+.aba {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 2rem;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  flex: 1 0 auto;
+  min-width: 180px;
+  justify-content: center;
+}
+
+.aba:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-3px);
+}
+
+.aba.ativa {
+  background: linear-gradient(135deg, #FF6B35, #FF8C42);
+  color: #FFFFFF;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+}
+
+.aba.ativa#hamburgueres {
+  background: linear-gradient(135deg, #8B4513, #A0522D);
+}
+
+.aba.ativa#bebidas {
+  background: linear-gradient(135deg, #4A90E2, #5DA8FF);
+}
+
+.aba.ativa#sobremesas {
+  background: linear-gradient(135deg, #C2185B, #E91E63);
+}
+
+.aba.ativa#promocoes {
+  background: linear-gradient(135deg, #FFD700, #FFC107);
+}
+
+/* LISTA DE ITENS */
+.lista {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 1.5rem;
+  border-left: 5px solid #FF6B35;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(255, 107, 53, 0.2);
+}
+
+.item-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.item-topo strong {
+  color: #FFD700;
+  font-size: 1.4rem;
+  flex: 1;
+  padding-right: 1rem;
+}
+
+.item-topo span {
+  color: #FF8C42;
+  font-size: 1.6rem;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  min-width: 100px;
+  text-align: center;
+}
+
+.item p {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.6;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* RODAPÉ */
+.rodape {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: rgba(45, 27, 0, 0.95);
+  border-top: 4px solid #FFD700;
+  backdrop-filter: blur(20px);
+  margin-top: 3rem;
+}
+
+.rodape img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 215, 0, 0.6);
+  margin-bottom: 1rem;
+}
+
+.rodape p {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.btn-home {
+  display: inline-block;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #2D1B00;
+  padding: 1rem 3rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.btn-home:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(255, 215, 0, 0.6);
+}
+
+/* ANIMAÇÕES */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .abas {
+    gap: 0.5rem;
+  }
+  
+  .aba {
+    min-width: 140px;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+  }
+  
+  .lista {
+    grid-template-columns: 1fr;
+    padding: 0 0.5rem;
+  }
+  
+  .logo-topo {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .btn-voltar {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+
+    <!-- ===== PRODUTOS ===== -->
+    <div id="section-produtos" class="sub-page" style="display:block;">
+
+        <!-- Listagem -->
+        <div id="produtos-list-view">
+            <div class="page-header">
+                <div>
+                    <h1>📦 Produtos</h1>
+                    <p>Gerencie o estoque e catálogo de produtos</p>
+                </div>
+                <button class="btn btn-primary" onclick="novoProduto()">
+                    <i class="bi bi-plus-circle"></i>
+                    Novo Produto
+                </button>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" id="pesquisaProduto" placeholder="Buscar por nome ou categoria..." onkeyup="pesquisarProduto()" />
+                <select id="categoriaFiltro" onchange="pesquisarProduto()" style="max-width:200px">
+                    <option value="">Todas as categorias</option>
+                    <option value="MANGA">Mangá</option>
+                    <option value="LIVRO_FICCAO">Ficção Científica</option>
+                    <option value="ACTION_FIGURE">Action Figure</option>
+                    <option value="JOGO_TABULEIRO">Jogo de Tabuleiro</option>
+                </select>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-bottom:16px; align-items:center; font-size:.85rem; color:var(--muted)">
+                <span style="display:inline-flex;align-items:center;gap:6px">
+                    <span style="width:12px;height:12px;background:rgba(245,158,11,.3);border-left:3px solid var(--warning);display:inline-block;border-radius:2px"></span>
+                    Estoque baixo (qtd ≤ mínimo)
+                </span>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nome</th>
+                                <th>Categoria</th>
+                                <th>Preço</th>
+                                <th>Estoque</th>
+                                <th>Mínimo</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaProdutos">
+                            <tr>
+                                <td colspan="8" class="empty">
+                                    <p>Carregando produtos...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- =========================
+             FORMULÁRIO DE PRODUTO
+        ========================= -->
+        <div id="produtos-form-view" style="display:none">
+
+            <input type="hidden" id="produtoId">
+
+            <div class="page-header">
+                <div>
+                    <h1 id="form-prod-title">Novo Produto</h1>
+                    <p>Preencha os dados do produto</p>
+                </div>
+            </div>
+
+            <div class="card">
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Nome do Produto *</label>
+                        <input type="text" id="prod-nome" placeholder="Ex: One Piece Vol. 100">
+                        <span class="error-msg" id="err-prod-nome">Campo obrigatório</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Categoria *</label>
+                        <select id="prod-cat">
+                            <option value="">Selecione...</option>
+                            <option value="MANGA">Mangá</option>
+                            <option value="LIVRO_FICCAO">Ficção Científica</option>
+                            <option value="ACTION_FIGURE">Action Figure</option>
+                            <option value="JOGO_TABULEIRO">Jogo de Tabuleiro</option>
+                        </select>
+                        <span class="error-msg" id="err-prod-cat">Selecione uma categoria</span>
+                    </div>
+
+                </div>
+
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label>Descrição</label>
+                        <input type="text" id="prod-desc" placeholder="Breve descrição do produto">
+                    </div>
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Preço (R$) *</label>
+                        <input type="number" id="prod-preco" placeholder="0.00" min="0.01" step="0.01">
+                        <span class="error-msg" id="err-prod-preco">Preço inválido</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quantidade em Estoque *</label>
+                        <input type="number" id="prod-estoque" placeholder="0" min="0" step="1">
+                        <span class="error-msg" id="err-prod-estoque">Valor inválido</span>
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Estoque Mínimo *</label>
+                        <input type="number" id="prod-minimo" value="5" min="0" step="1">
+                        <span class="error-msg" id="err-prod-minimo">Valor inválido</span>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="cancelarProduto()">Cancelar</button>
+                    <button class="btn btn-primary" onclick="salvarProduto()">Salvar Produto</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+         SCRIPTS (somente links, SEM script inline)
+    ============================================================ -->
+
+    <!-- 1. API -->
+    <script src="../assets/js/api.js"></script>
+
+    <!-- 2. Autenticação -->
+    <script src="../assets/js/auth.js"></script>
+
+    <!-- 3. Utilitários -->
+    <script src="../assets/js/app.js"></script>
+
+    <!-- 4. Produtos (já tem o DOMContentLoaded dentro) -->
+    <script src="../assets/js/produtos.js"></script>
+
+</body>
+
+</html>

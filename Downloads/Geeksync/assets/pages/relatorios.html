@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <div id="section-relatorios" class="sub-page" style="display:block;">
+
+        <!-- Header -->
+        <div class="page-header">
+            <div>
+                <h1>📊 Relatórios</h1>
+                <p>Analise vendas, produtos e desempenho do negócio</p>
+            </div>
+            <button class="btn btn-secondary" onclick="limparRelatorio()">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                Limpar
+            </button>
+        </div>
+
+        <!-- Cards de Resumo Rápido -->
+        <div class="dashboard-grid" style="margin-bottom:24px;">
+            <div class="dashboard-card">
+                <div class="card-header-dash">
+                    <div>
+                        <div class="card-label">Total de Vendas</div>
+                        <div class="card-value" id="resumoVendas">0</div>
+                    </div>
+                    <i class="bi bi-cart-check card-icon blue"></i>
+                </div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-header-dash">
+                    <div>
+                        <div class="card-label">Faturamento Total</div>
+                        <div class="card-value" id="resumoFaturamento" style="color:var(--success);">R$ 0,00</div>
+                    </div>
+                    <i class="bi bi-currency-dollar card-icon green"></i>
+                </div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-header-dash">
+                    <div>
+                        <div class="card-label">Clientes</div>
+                        <div class="card-value" id="resumoClientes">0</div>
+                    </div>
+                    <i class="bi bi-people card-icon blue"></i>
+                </div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-header-dash">
+                    <div>
+                        <div class="card-label">Produtos</div>
+                        <div class="card-value" id="resumoProdutos">0</div>
+                    </div>
+                    <i class="bi bi-box-seam card-icon blue"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card" style="margin-bottom:24px;">
+            <div class="card-header">
+                <h5>🔍 Filtros de Relatórios</h5>
+            </div>
+            <div class="card-body">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:18px;">
+
+                    <!-- Relatório por Período -->
+                    <div style="grid-column: 1 / -1;">
+                        <h6 style="color:var(--muted); margin-bottom:12px; font-size:.85rem; text-transform:uppercase; letter-spacing:.05em;">
+                            📅 Relatório por Período
+                        </h6>
+                        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+                            <div class="form-group" style="flex:1; min-width:150px; margin-bottom:0;">
+                                <label>Data Inicial</label>
+                                <input type="date" id="dataInicio" />
+                            </div>
+                            <div class="form-group" style="flex:1; min-width:150px; margin-bottom:0;">
+                                <label>Data Final</label>
+                                <input type="date" id="dataFim" />
+                            </div>
+                            <button class="btn btn-primary" id="btnGerarPeriodo" style="margin-bottom:0;">
+                                <i class="bi bi-search"></i>
+                                Gerar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Relatório por Cliente -->
+                    <div>
+                        <h6 style="color:var(--muted); margin-bottom:12px; font-size:.85rem; text-transform:uppercase; letter-spacing:.05em;">
+                            👤 Relatório por Cliente
+                        </h6>
+                        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+                            <div class="form-group" style="flex:1; min-width:200px; margin-bottom:0;">
+                                <label>Selecione o Cliente</label>
+                                <select id="clienteRelatorio">
+                                    <option value="">Carregando clientes...</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" id="btnGerarCliente" style="margin-bottom:0;">
+                                <i class="bi bi-search"></i>
+                                Gerar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Relatório de Estoque Baixo -->
+                    <div>
+                        <h6 style="color:var(--muted); margin-bottom:12px; font-size:.85rem; text-transform:uppercase; letter-spacing:.05em;">
+                            ⚠️ Estoque Baixo
+                        </h6>
+                        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+                            <button class="btn btn-warning" id="btnGerarEstoque" style="margin-bottom:0;">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Verificar Estoque Baixo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Relatório de Produtos Mais Vendidos -->
+                    <div style="grid-column: 1 / -1;">
+                        <h6 style="color:var(--muted); margin-bottom:12px; font-size:.85rem; text-transform:uppercase; letter-spacing:.05em;">
+                            🏆 Produtos Mais Vendidos
+                        </h6>
+                        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+                            <button class="btn btn-success" id="btnGerarMaisVendidos" style="margin-bottom:0;">
+                                <i class="bi bi-trophy"></i>
+                                Gerar Ranking
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Resultado do Relatório -->
+        <div id="resultadoRelatorio">
+            <div class="empty">
+                <p>Selecione um filtro e clique em "Gerar" para visualizar o relatório</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+         SCRIPTS (somente links, SEM script inline)
+    ============================================================ -->
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script src="../assets/js/relatorios.js"></script>
+
+</body>
+
+</html>

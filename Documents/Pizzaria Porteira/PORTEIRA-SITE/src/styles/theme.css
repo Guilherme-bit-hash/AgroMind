@@ -1,0 +1,14 @@
+:root {
+    --bege: #f3e6c8;
+    --marrom: #5a3e2b;
+    --verde: #6b7d5a;
+    --escuro: #2e1f16;
+}
+
+body {
+    margin: 0;
+    font-family: 'Georgia', serif;
+    background-color: var(--bege);
+    color: var(--escuro);
+    
+}
